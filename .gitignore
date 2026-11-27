@@ -3,6 +3,7 @@ __pycache__/
 .pytest_cache/
 .venv/
 benchmarks/results/
+plugins/tierly/evals/results/
 *.jsonl
 .DS_Store
 # Local Claude Code settings and locally installed skills (never part of the plugin)

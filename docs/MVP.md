@@ -114,4 +114,4 @@ The MVP ships when every item below is true.
 | Overhead exceeds savings on small tasks | Triage gate; batching watcher calls; brief length limits |
 | Model or effort guidance changes | Aliases in agents; routing review on each model release |
 | Users expect exact cost numbers | Cost index is labeled as an estimate; benchmarks give measured numbers |
-| Name collision on publish | Check GitHub and the Claude plugin directory for "tierly" before tagging |
+| Name collision on publish | Renamed to Tierly after the 2026-11-27 check; not published to any directory |

@@ -63,6 +63,8 @@ safe to hand down) and discipline on every task. Tierly does it for them.
 
 ### 4.1 Install
 
+Install Tierly from this GitHub repo's own marketplace.
+
 ```text
 /plugin marketplace add T-RexBytes/conductor
 /plugin install tierly@tierly
@@ -341,10 +343,12 @@ at a plugin root, so none is placed inside `plugins/tierly/`.
 | Job | What it checks |
 |---|---|
 | `validate` | `scripts/validate_repo.py` (section 10.2) and the pytest suite |
-| `plugin-validate` | `claude plugin validate .` and `claude plugin validate ./plugins/tierly` with the official CLI |
+| `plugin-validate` | `claude plugin validate .` and a stricter plugin quality check with the directory profile |
 | `markdown` | markdownlint on all Markdown |
 | `links` | lychee in offline mode: every relative link and anchor resolves |
 | `spelling` | codespell |
+
+The stricter quality check runs `claude plugin validate ./plugins/tierly --profile directory`.
 
 A separate `benchmark.yml` workflow runs the benchmark suite on manual dispatch only, with an API
 key from repository secrets. It never runs on pull requests from forks.

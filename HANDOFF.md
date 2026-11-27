@@ -23,7 +23,7 @@ tier up, and reports. It must never interfere with anything outside `/tierly`
 |---|---|
 | `.claude-plugin/marketplace.json` | Done |
 | `plugins/tierly/.claude-plugin/plugin.json` | Done (version 0.1.0) |
-| `plugins/tierly/README.md` | Done (required by the plugin directory) |
+| `plugins/tierly/README.md` | Done |
 | `plugins/tierly/skills/tierly/SKILL.md` | Done: hard rules, flags, triage, decomposition, scoring, plan approval, dispatch, watcher, escalation, integration, report, failure handling |
 | `plugins/tierly/skills/tierly/reference/tiers.json` | Done: single source of truth for tiers |
 | `plugins/tierly/skills/tierly/reference/ROUTING.md` | Done: rubric, hard floors, watcher policy, worked examples |
@@ -56,7 +56,8 @@ tier up, and reports. It must never interfere with anything outside `/tierly`
 - `codespell` → clean
 - Relative link and anchor check → 0 problems
 - `claude plugin validate .` → passed (Claude Code 2.1.332)
-- `claude plugin validate ./plugins/tierly --profile directory` → passed, 1 warning (no icon)
+- Stricter quality check (`claude plugin validate ./plugins/tierly --profile directory`) →
+  passed, 1 warning (no icon)
 
 Facts confirmed by those runs:
 
@@ -75,7 +76,7 @@ Do them in this order. After each one, run `python scripts/validate_repo.py` and
 1. In `docs/BUILD-SPEC.md` section 13, mark **V5 resolved** (validate runs without auth) and
    record for **V2** that the validator lists the agents as `tierly:<name>`; a live dispatch test
    is still needed.
-2. In `.github/workflows/ci.yml`, change the plugin step to
+2. In `.github/workflows/ci.yml`, use the stricter quality check for the plugin step:
    `claude plugin validate ./plugins/tierly --profile directory`.
 3. Commit: `chore: record verification results and tighten plugin validation`.
 
@@ -84,9 +85,8 @@ Do them in this order. After each one, run `python scripts/validate_repo.py` and
 1. `git init`, commit, push to `T-RexBytes/conductor`.
 2. Confirm all CI jobs pass on GitHub. If `markdownlint-cli2-action@v19` or another action version
    fails to resolve, bump it to the latest major and note it in the commit.
-3. Before publishing widely, check that the name "tierly" is not taken on GitHub or in the Claude
-   plugin directory. If it is, rename consistently (the validator's `PLUGIN_NAME`, manifests,
-   agent descriptions, `tiers.json` agent refs, SKILL.md, docs).
+3. The 2026-11-27 name check found that "conductor" collided, so the plugin was renamed Tierly and
+   needs no further name check because it is not published to any directory.
 
 ### Step 3: Live verification (milestones M2–M5)
 
@@ -114,8 +114,8 @@ If any eval fails, fix SKILL.md, the agent or the reference file, then re-run th
 
 ### Step 5: Release (milestone M7)
 
-1. Add a square PNG icon at `plugins/tierly/.claude-plugin/icon.png` (512–2048 px, under 2 MB).
-   The plugin directory keeps only the first icon submitted, so use the final design.
+1. A square PNG icon at `plugins/tierly/.claude-plugin/icon.png` (512–2048 px, under 2 MB) is
+   optional and only removes the validator warning.
 2. Replace modeled savings ranges in README with measured results once benchmarks support them.
 3. Tick every box in `docs/MVP.md` section 5, update `CHANGELOG.md`, tag `v0.1.0`.
 
@@ -124,6 +124,8 @@ If any eval fails, fix SKILL.md, the agent or the reference file, then re-run th
 - **Name:** Tierly (chosen by the maintainer on 2026-11-27 after "Conductor" collided with
   several existing Claude Code plugins and products). Earlier working names: "Allot" and
   "Conductor". "Tierward" and "Cadre" were rejected because they are taken.
+- **Distribution:** GitHub only, from this repo's own marketplace. Not submitted to the official
+  plugin directory or any other listing.
 - **Claude-first.** Other providers (Codex, Gemini) are v0.3 "Bridges", opt-in only.
 - **No hooks at all.** Plugin hooks fire every session, and skill-frontmatter hooks stay
   registered after the skill runs. Both would break non-interference.
