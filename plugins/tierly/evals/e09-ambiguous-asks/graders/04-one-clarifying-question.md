@@ -4,6 +4,6 @@ focus: trace
 weight: 1
 ---
 
-Before planning or dispatching anything, the orchestrator asks the user one clarifying question
-about what they want. A list of example options under that question counts as one question.
-The orchestrator waits for the answer without asking a second, unrelated question.
+The final response asks the user what they want "better" to mean. That is a single question,
+optionally followed by a list of example options, and the run waits for the answer instead of
+planning or changing files.
