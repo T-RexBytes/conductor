@@ -1,3 +1,3 @@
 [codespell]
-skip = .git,*.jsonl,./benchmarks/results
-ignore-words-list = conductor
+# e03 keeps the typo "retrun" on purpose: the eval checks that Conductor fixes it.
+skip = .git,*.jsonl,./benchmarks/results,./plugins/conductor/evals/e03-direct-dispatch

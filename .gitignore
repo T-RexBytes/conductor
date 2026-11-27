@@ -5,3 +5,4 @@ __pycache__/
 benchmarks/results/
 *.jsonl
 .DS_Store
+.claude/settings.local.json
