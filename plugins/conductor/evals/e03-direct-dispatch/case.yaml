@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: e03-direct-dispatch
+description: Route a single docstring correction through direct dispatch.
+expected_outcome: |
+  Show a one-line plan and dispatch the worker without approval to correct the typo.
+context: {scaffold_script: place-files.sh}

@@ -391,6 +391,10 @@ the outcome in the release PR.
 | E9 | Ambiguous request ("make it better") | Orchestrator asks one question before planning |
 | E10 | Deny a permission prompt during a run | Task marked blocked; no workaround attempted |
 
+E1–E6, E9 and E10 are encoded under `plugins/conductor/evals/`. Run them with the plugin eval
+command in the [release instructions](../CONTRIBUTING.md#releases-maintainers).
+E7 and E8 stay manual.
+
 ### 11.3 Benchmarks (`benchmarks/`)
 
 Each task runs twice from a clean copy of its fixture: **baseline** (`claude --bare -p` with

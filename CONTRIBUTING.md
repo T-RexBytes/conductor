@@ -72,6 +72,12 @@ The PR template repeats this list.
 3. Run behavioral evals E1–E10 and the benchmark suite; record results in the release PR.
 4. Merge, tag `vX.Y.Z`, publish a GitHub release with the changelog section.
 
+Run the automated behavioral evals with the following command.
+
+```bash
+claude plugin eval ./plugins/conductor --scaffold --allow-tools "Write,Edit,Bash(python -m pytest*)" --ablation none --no-publish
+```
+
 ## Reporting bugs and proposing features
 
 Use the issue templates. Security problems go to [SECURITY.md](SECURITY.md), not public issues.
