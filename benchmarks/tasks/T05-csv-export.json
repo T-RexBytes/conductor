@@ -1,0 +1,10 @@
+{
+  "id": "T05",
+  "title": "Add inventory CSV export",
+  "kind": "mixed",
+  "fixture": "inventory",
+  "prompt": "Add export_csv(store, path) to inventory/storage.py. Write the header sku,name,category,unit_price,quantity, then one row per item sorted by SKU. Use category values and format prices with exactly two decimal places. Write UTF-8 CSV with LF line endings. Add a csv subcommand to the CLI that takes an output path, as in python -m inventory.cli --input stock.json csv stock.csv. Add tests for the export and CLI. All tests must pass with python -m pytest -q.",
+  "allowed_tools": "Read,Edit,Write,Glob,Grep,Bash(python -m pytest *)",
+  "check": "checks/check_t05.py",
+  "timeout_s": 1200
+}

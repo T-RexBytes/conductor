@@ -1,0 +1,10 @@
+{
+  "id": "T03",
+  "title": "Document the inventory architecture",
+  "kind": "read-heavy",
+  "fixture": "inventory",
+  "prompt": "Create docs/ARCHITECTURE.md. Give each Python module in inventory/, including __init__.py, its own section. Explain what each module does, list its public functions and methods, and describe which inventory modules it depends on. Do not modify any Python files.",
+  "allowed_tools": "Read,Write,Glob,Grep",
+  "check": "checks/check_t03.py",
+  "timeout_s": 1200
+}

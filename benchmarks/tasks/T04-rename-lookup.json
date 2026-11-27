@@ -1,0 +1,10 @@
+{
+  "id": "T04",
+  "title": "Rename the inventory lookup method",
+  "kind": "tiny",
+  "fixture": "inventory",
+  "prompt": "Rename Store.find_item to Store.get_item everywhere in the inventory package and tests. Keep its behavior the same and remove the old name. All tests must pass with python -m pytest -q.",
+  "allowed_tools": "Read,Edit,Glob,Grep,Bash(python -m pytest *)",
+  "check": "checks/check_t04.py",
+  "timeout_s": 1200
+}

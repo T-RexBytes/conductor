@@ -1,0 +1,10 @@
+{
+  "id": "T06",
+  "title": "Fix pagination for exact multiples",
+  "kind": "mixed",
+  "fixture": "inventory",
+  "prompt": "paginate() in inventory/pagination.py reports one page too many, with an empty last page, when the number of items is an exact multiple of page_size. Fix it and add a regression test. Preserve the documented behavior for empty input and out-of-range pages. All tests must pass with python -m pytest -q.",
+  "allowed_tools": "Read,Edit,Write,Glob,Grep,Bash(python -m pytest *)",
+  "check": "checks/check_t06.py",
+  "timeout_s": 1200
+}
