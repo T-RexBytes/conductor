@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static checks for the Conductor repository.
+"""Static checks for the Tierly repository.
 
 Enforces the manifest, frontmatter, routing and non-interference rules in
 docs/BUILD-SPEC.md section 10.2. Standard library plus PyYAML; no network access.
@@ -21,8 +21,8 @@ from typing import Any
 
 import yaml
 
-PLUGIN_NAME = "conductor"
-INTERNAL_MARKER = "Internal to the conductor plugin"
+PLUGIN_NAME = "tierly"
+INTERNAL_MARKER = "Internal to the tierly plugin"
 
 # Documented Claude Code skill frontmatter keys (code.claude.com/docs/en/skills).
 SKILL_KEYS = {
@@ -36,7 +36,7 @@ AGENT_KEYS = {
     "name", "description", "model", "effort", "maxTurns", "tools", "disallowedTools",
     "skills", "memory", "background", "omitClaudeMd", "isolation", "color", "experimental",
 }
-# Keys Conductor agents must never use (ignored for plugin agents, or break non-interference).
+# Keys Tierly agents must never use (ignored for plugin agents, or break non-interference).
 AGENT_BANNED_KEYS = {"tools", "permissionMode", "hooks", "mcpServers", "initialPrompt"}
 
 EFFORT_LEVELS = {"low", "medium", "high", "xhigh", "max"}
@@ -163,8 +163,8 @@ def check_forbidden_paths(plugin_dir: Path, rep: Report) -> None:
 
 
 def check_skill(plugin_dir: Path, rep: Report) -> None:
-    skill = plugin_dir / "skills" / "conductor" / "SKILL.md"
-    where = f"plugins/{PLUGIN_NAME}/skills/conductor/SKILL.md"
+    skill = plugin_dir / "skills" / "tierly" / "SKILL.md"
+    where = f"plugins/{PLUGIN_NAME}/skills/tierly/SKILL.md"
     if not skill.exists():
         rep.error(where, "file not found")
         return
@@ -238,7 +238,7 @@ def check_agents(plugin_dir: Path, rep: Report) -> dict[str, dict[str, Any]]:
             rep.error(where, "disallowedTools must include Agent (N10)")
         if name in {"scout", "watcher"} and not READ_ONLY_DENY <= denied:
             rep.error(where, f"read-only agent must deny {sorted(READ_ONLY_DENY)}")
-        marker = "CONDUCTOR-VERDICT" if name == "watcher" else "CONDUCTOR-REPORT"
+        marker = "TIERLY-VERDICT" if name == "watcher" else "TIERLY-REPORT"
         if marker not in body:
             rep.error(where, f"body must define the {marker} output contract")
         if isinstance(name, str):
@@ -250,7 +250,7 @@ def check_agents(plugin_dir: Path, rep: Report) -> dict[str, dict[str, Any]]:
 
 
 def check_tiers(plugin_dir: Path, agents: dict[str, dict[str, Any]], rep: Report) -> None:
-    path = plugin_dir / "skills" / "conductor" / "reference" / "tiers.json"
+    path = plugin_dir / "skills" / "tierly" / "reference" / "tiers.json"
     where = "tiers.json"
     data = load_json(path, rep)
     if data is None:

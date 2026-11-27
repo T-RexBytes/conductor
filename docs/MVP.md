@@ -1,4 +1,4 @@
-# Conductor MVP (v0.1.0)
+# Tierly MVP (v0.1.0)
 
 The smallest release that proves the core claim: **routing micro-tasks to cheaper Claude tiers,
 with an independent watcher, cuts cost without losing quality, and never gets in the user's way.**
@@ -14,18 +14,18 @@ and want lower spend or slower usage-limit burn without supervising model choice
 
 | ID | As a user, I want to... | So that... |
 |---|---|---|
-| U1 | type `/conductor <task>` and get the task done | I do not pick models and effort myself |
+| U1 | type `/tierly <task>` and get the task done | I do not pick models and effort myself |
 | U2 | see the plan (tasks, tiers, cost index) before anything runs | I stay in control of spend |
 | U3 | approve, edit, switch to a budget profile, or cancel the plan | the run matches my priorities |
 | U4 | trust that cheap tiers did not cut corners | quality matches what I would get from Opus |
-| U5 | have Conductor stay silent unless I call it | my normal work, skills and MCP tools are untouched |
+| U5 | have Tierly stay silent unless I call it | my normal work, skills and MCP tools are untouched |
 | U6 | get a short report of what ran where and what changed | I can review the work quickly |
 | U7 | have small requests handled without ceremony | I never pay orchestration overhead for a one-line fix |
 
 ## 3. In scope
 
 1. Plugin installable from GitHub through a Claude Code marketplace.
-2. One skill, `/conductor`, with flags `--plan-only`, `--yes`, `--no-recon`, `--profile`,
+2. One skill, `/tierly`, with flags `--plan-only`, `--yes`, `--no-recon`, `--profile`,
    `--parallel`.
 3. Six agents: scout, worker, builder, builder-plus, architect, watcher.
 4. Routing: four-axis scoring, score bands, hard floors, profiles (`tiers.json`, `ROUTING.md`).
@@ -56,11 +56,11 @@ The MVP ships when every item below is true.
 
 ### Functional
 
-- [ ] A1. Fresh install from the GitHub marketplace works; `/conductor` appears in the `/` menu.
+- [ ] A1. Fresh install from the GitHub marketplace works; `/tierly` appears in the `/` menu.
 - [ ] A2. Behavioral evals E1–E10 from BUILD-SPEC section 11.2 pass and are recorded in the
       release PR.
-- [ ] A3. On the seed benchmark tasks, Conductor's pass rate equals the baseline's.
-- [ ] A4. On the seed benchmark tasks, Conductor's total cost is lower than the baseline's.
+- [ ] A3. On the seed benchmark tasks, Tierly's pass rate equals the baseline's.
+- [ ] A4. On the seed benchmark tasks, Tierly's total cost is lower than the baseline's.
 - [ ] A5. A one-line request takes the direct-dispatch path with no approval prompt.
 - [ ] A6. `--plan-only` writes no files and dispatches nothing.
 
@@ -84,7 +84,7 @@ The MVP ships when every item below is true.
 | Median cost reduction on the benchmark suite, quality held | ≥ 25% |
 | Watcher `fail` rate on first attempt | ≤ 15% (higher means routing is too aggressive) |
 | Tasks needing more than one escalation | ≤ 5% |
-| Bug reports about Conductor interfering with non-Conductor work | 0 |
+| Bug reports about Tierly interfering with non-Tierly work | 0 |
 
 ## 7. Milestones
 
@@ -100,11 +100,11 @@ The MVP ships when every item below is true.
 
 ## 8. Demo script (for README GIF and presentations)
 
-1. Show a normal prompt in Claude Code: Conductor does nothing (non-interference).
-2. `/conductor --plan-only add pagination to the orders API with tests` → the plan table.
-3. `/conductor add pagination to the orders API with tests` → approve → progress → watcher
+1. Show a normal prompt in Claude Code: Tierly does nothing (non-interference).
+2. `/tierly --plan-only add pagination to the orders API with tests` → the plan table.
+3. `/tierly add pagination to the orders API with tests` → approve → progress → watcher
    verdicts → report with routing mix and cost index.
-4. `/conductor fix the typo in README` → direct dispatch, no approval prompt.
+4. `/tierly fix the typo in README` → direct dispatch, no approval prompt.
 
 ## 9. Risks
 
@@ -114,4 +114,4 @@ The MVP ships when every item below is true.
 | Overhead exceeds savings on small tasks | Triage gate; batching watcher calls; brief length limits |
 | Model or effort guidance changes | Aliases in agents; routing review on each model release |
 | Users expect exact cost numbers | Cost index is labeled as an estimate; benchmarks give measured numbers |
-| Name collision on publish | Check GitHub and the Claude plugin directory for "conductor" before tagging |
+| Name collision on publish | Check GitHub and the Claude plugin directory for "tierly" before tagging |

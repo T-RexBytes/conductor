@@ -18,7 +18,7 @@ body:
   - type: checkboxes
     id: principles
     attributes:
-      label: Fit with Conductor's principles
+      label: Fit with Tierly's principles
       options:
         - label: Works without hooks, settings changes, or auto-activation
           required: true

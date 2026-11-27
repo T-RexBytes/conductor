@@ -19,7 +19,7 @@ def verify_tests(workdir: Path, task_id: str) -> str | None:
 
     # A sibling directory keeps hidden tests outside the submission even when
     # the system temp directory has been redirected into the workdir.
-    with TemporaryDirectory(prefix=f"conductor-{task_id}-", dir=workdir.parent) as temp:
+    with TemporaryDirectory(prefix=f"tierly-{task_id}-", dir=workdir.parent) as temp:
         copied = Path(temp) / "hidden"
         shutil.copytree(hidden, copied)
         for suite, target in (("hidden", copied), ("fixture", workdir / "tests")):

@@ -1,4 +1,4 @@
 [codespell]
-# e03 keeps the typo "retrun" on purpose: the eval checks that Conductor fixes it.
-skip = .git,*.jsonl,./benchmarks/results,./plugins/conductor/evals/e03-direct-dispatch
+# e03 keeps the typo "retrun" on purpose: the eval checks that Tierly fixes it.
+skip = .git,*.jsonl,./benchmarks/results,./plugins/tierly/evals/e03-direct-dispatch
 ignore-words-list = caf

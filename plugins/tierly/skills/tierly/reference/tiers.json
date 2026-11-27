@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-11-27",
+  "score_range": [0, 12],
+  "profiles": {
+    "budget": -2,
+    "balanced": 0,
+    "quality": 2
+  },
+  "tiers": [
+    {
+      "id": "scout",
+      "agent": "tierly:scout",
+      "model": "haiku",
+      "effort": "low",
+      "score_min": 0,
+      "score_max": 2,
+      "writes": false,
+      "cost_index": 1,
+      "use_for": "Short, read-only lookups: locate files and symbols, list usages, read a config, extract facts from a small set of files.",
+      "rationale": "Cheapest tier. Haiku at low effort is suited to short tool tasks but more likely to skip checks in long prompts, so scouts get short, closed questions only."
+    },
+    {
+      "id": "worker",
+      "agent": "tierly:worker",
+      "model": "haiku",
+      "effort": "medium",
+      "score_min": 3,
+      "score_max": 4,
+      "writes": true,
+      "cost_index": 1,
+      "use_for": "Mechanical, fully specified changes: boilerplate, tests from an explicit spec, docs, renames, formatting, data transformation.",
+      "rationale": "Haiku at medium (its default) is the documented starting point for most work including agentic coding, at 1/20 of Sonnet's per-token price."
+    },
+    {
+      "id": "builder",
+      "agent": "tierly:builder",
+      "model": "sonnet",
+      "effort": "medium",
+      "score_min": 5,
+      "score_max": 7,
+      "writes": true,
+      "cost_index": 20,
+      "use_for": "Well-specified features and bug fixes with a known cause, multi-file edits inside one module.",
+      "rationale": "Sonnet guidance: start at medium for well-specified agentic coding."
+    },
+    {
+      "id": "builder-plus",
+      "agent": "tierly:builder-plus",
+      "model": "sonnet",
+      "effort": "high",
+      "score_min": 8,
+      "score_max": 9,
+      "writes": true,
+      "cost_index": 20,
+      "use_for": "Harder or longer implementation, cross-module changes, debugging with partial information.",
+      "rationale": "Sonnet guidance: move to high for harder or longer tasks."
+    },
+    {
+      "id": "architect",
+      "agent": "tierly:architect",
+      "model": "opus",
+      "effort": "high",
+      "score_min": 10,
+      "score_max": 12,
+      "writes": true,
+      "cost_index": 40,
+      "use_for": "Architecture and design decisions, security-sensitive changes, unknown root causes in high-risk code or after a lower tier failed, work where a wrong call is expensive.",
+      "rationale": "Reserved for judgment-heavy work; effort set explicitly because Opus 5.5 defaults to medium."
+    }
+  ],
+  "watcher": {
+    "agent": "tierly:watcher",
+    "model": "opus",
+    "effort": "high",
+    "cost_index": 40
+  },
+  "orchestrator": {
+    "model": "opus",
+    "effort": "high"
+  },
+  "escalation_order": ["scout", "worker", "builder", "builder-plus", "architect"],
+  "max_escalations_per_task": 2,
+  "default_parallel": 4,
+  "max_parallel": 8
+}

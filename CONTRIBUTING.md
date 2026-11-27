@@ -1,6 +1,6 @@
-# Contributing to Conductor
+# Contributing to Tierly
 
-Thanks for helping. Conductor is used to make decisions about other people's money and code, so the
+Thanks for helping. Tierly is used to make decisions about other people's money and code, so the
 bar for changes is evidence, not opinion. Please read this page before opening a pull request.
 
 ## Ground rules
@@ -23,10 +23,10 @@ python -m pytest -q
 Try the plugin from your clone without installing it:
 
 ```bash
-claude --plugin-dir ./plugins/conductor
+claude --plugin-dir ./plugins/tierly
 ```
 
-Then run `/conductor --plan-only <some task>` in a scratch project.
+Then run `/tierly --plan-only <some task>` in a scratch project.
 
 ## Kinds of change
 
@@ -68,14 +68,14 @@ The PR template repeats this list.
 ## Releases (maintainers)
 
 1. Move "Unreleased" entries in `CHANGELOG.md` under the new version.
-2. Bump `version` in `plugins/conductor/.claude-plugin/plugin.json`.
+2. Bump `version` in `plugins/tierly/.claude-plugin/plugin.json`.
 3. Run behavioral evals E1–E10 and the benchmark suite; record results in the release PR.
 4. Merge, tag `vX.Y.Z`, publish a GitHub release with the changelog section.
 
 Run the automated behavioral evals with the following command.
 
 ```bash
-claude plugin eval ./plugins/conductor --scaffold --allow-tools "Write,Edit,Bash(python -m pytest*)" --ablation none --no-publish
+claude plugin eval ./plugins/tierly --scaffold --allow-tools "Write,Edit,Bash(python -m pytest*)" --ablation none --no-publish
 ```
 
 ## Reporting bugs and proposing features

@@ -1,12 +1,12 @@
 # Benchmarks
 
-Measures whether Conductor lowers cost **without** lowering quality. Each task runs in two
+Measures whether Tierly lowers cost **without** lowering quality. Each task runs in two
 variants, with a fresh fixture copy for each run.
 
 | Variant | Command |
 |---|---|
 | baseline | `claude --bare -p "<prompt>" --model opus --effort medium --output-format json ...` |
-| conductor | `claude --bare -p "/conductor --yes <prompt>" --model opus --plugin-dir ./plugins/conductor ...` |
+| tierly | `claude --bare -p "/tierly:tierly --yes <prompt>" --model opus --plugin-dir ./plugins/tierly ...` |
 
 The harness records `total_cost_usd` from the JSON output (a client-side estimate) and runs the
 task's check script for pass or fail.
@@ -18,12 +18,12 @@ python benchmarks/run_benchmark.py --dry-run          # print the commands, run 
 export ANTHROPIC_API_KEY=...                           # bare mode needs an API key
 python benchmarks/run_benchmark.py --out results.jsonl
 python benchmarks/run_benchmark.py --repeat 3 --baseline-effort high --out results.jsonl
-python benchmarks/run_benchmark.py --tasks T01 --variants conductor
+python benchmarks/run_benchmark.py --tasks T01 --variants tierly
 ```
 
 `--repeat N` runs each task and variant N times (default 1, minimum 1). The dry run prints
 each command with its run index. `--baseline-effort` accepts `low`, `medium`, or `high` and
-defaults to `medium`, the documented Opus default. The Conductor skill sets its orchestrator's
+defaults to `medium`, the documented Opus default. The Tierly skill sets its orchestrator's
 effort. Each JSONL row records the run index and the selected baseline effort for either variant.
 The summary reports pass rate over all runs and mean cost over runs with a reported cost.
 

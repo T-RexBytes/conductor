@@ -38,16 +38,16 @@ def test_unknown_task_id_rejected() -> None:
 def test_build_command_variants() -> None:
     task = rb.load_tasks({"T01"})[0]
     base = rb.build_command(task, "baseline")
-    conductor = rb.build_command(task, "conductor")
+    tierly = rb.build_command(task, "tierly")
     assert base[:3] == ["claude", "--bare", "-p"]
     assert base[3] == task.prompt
     assert base[base.index("--effort") + 1] == "medium"
     assert "--plugin-dir" not in base
-    assert conductor[3].startswith("/conductor:conductor --yes ")
-    assert conductor[conductor.index("--plugin-dir") + 1] == str(rb.PLUGIN_DIR)
+    assert tierly[3].startswith("/tierly:tierly --yes ")
+    assert tierly[tierly.index("--plugin-dir") + 1] == str(rb.PLUGIN_DIR)
     assert base[base.index("--allowedTools") + 1] == task.allowed_tools
-    assert conductor[conductor.index("--allowedTools") + 1] == f"{task.allowed_tools},Agent"
-    for cmd in (base, conductor):
+    assert tierly[tierly.index("--allowedTools") + 1] == f"{task.allowed_tools},Agent"
+    for cmd in (base, tierly):
         assert cmd[cmd.index("--output-format") + 1] == "json"
         assert cmd[cmd.index("--model") + 1] == "opus"
     with pytest.raises(ValueError):
@@ -76,13 +76,13 @@ def test_summarize_table() -> None:
         {"task": "T01", "variant": "baseline", "run": 1, "passed": True, "total_cost_usd": 1.0},
         {"task": "T01", "variant": "baseline", "run": 2, "passed": False, "total_cost_usd": 0.0},
         {"task": "T01", "variant": "baseline", "run": 3, "passed": True, "total_cost_usd": None},
-        {"task": "T01", "variant": "conductor", "run": 1, "passed": False, "total_cost_usd": None},
+        {"task": "T01", "variant": "tierly", "run": 1, "passed": False, "total_cost_usd": None},
     ]
     text = rb.summarize(rows)
     assert "| Task | Variant | Run |" in text
     assert "| T01 | baseline | 3 | yes | n/a |" in text
     assert "| baseline | 3 | 2/3 (66.7%) | 0.5000 | 1.0000 | 1 |" in text
-    assert "| conductor | 1 | 0/1 (0.0%) | n/a | 0.0000 | 1 |" in text
+    assert "| tierly | 1 | 0/1 (0.0%) | n/a | 0.0000 | 1 |" in text
 
 
 def test_dry_run_repeats_and_sets_baseline_effort(
@@ -93,12 +93,12 @@ def test_dry_run_repeats_and_sets_baseline_effort(
 
     monkeypatch.setattr(subprocess, "run", boom)
     assert rb.main(["--dry-run", "--tasks", "T01", "--repeat", "2", "--baseline-effort", "high"]) == 0
-    baseline_1, baseline_2, conductor_1, conductor_2 = capsys.readouterr().out.splitlines()
+    baseline_1, baseline_2, tierly_1, tierly_2 = capsys.readouterr().out.splitlines()
     for run, line in enumerate((baseline_1, baseline_2), start=1):
         assert line.startswith(f"[T01 baseline run {run}] claude --bare -p")
         assert line.endswith("--effort high")
-    for run, line in enumerate((conductor_1, conductor_2), start=1):
-        assert line.startswith(f"[T01 conductor run {run}] claude --bare -p '/conductor:conductor --yes")
+    for run, line in enumerate((tierly_1, tierly_2), start=1):
+        assert line.startswith(f"[T01 tierly run {run}] claude --bare -p '/tierly:tierly --yes")
         assert "--effort" not in line
 
 

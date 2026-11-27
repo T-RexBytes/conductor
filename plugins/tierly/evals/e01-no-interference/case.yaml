@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: e01-no-interference
+description: Answer a coding question without activating Tierly.
+expected_outcome: |
+  Answer in one sentence that subtract(a, b) returns a minus b.
+context: {scaffold_script: place-files.sh}

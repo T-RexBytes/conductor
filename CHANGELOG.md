@@ -8,11 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [0.1.0] - unreleased
 
-Renamed from the working name Allot to Conductor; the command is `/conductor`.
+Renamed from the working names Allot and Conductor to Tierly; the command is `/tierly`.
 
 ### Added
 
-- `/conductor` orchestrator skill with triage gate, four-axis scoring, hard floors, profiles,
+- `/tierly` orchestrator skill with triage gate, four-axis scoring, hard floors, profiles,
   plan approval, watcher review and escalation ladder.
 - Agents: scout, worker, builder, builder-plus, architect, watcher.
 - Routing table `tiers.json` and rubric `ROUTING.md`.

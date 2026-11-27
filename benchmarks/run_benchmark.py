@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Conductor benchmark harness.
+"""Tierly benchmark harness.
 
 Runs each task in two variants, with a fresh fixture copy for each run:
 
 * baseline: plain Claude Code on Opus, no plugin
-* conductor: the same prompt through `/conductor:conductor --yes`, with the plugin loaded
+* tierly: the same prompt through `/tierly:tierly --yes`, with the plugin loaded
 
 Both runs use `claude --bare -p ... --output-format json`, which reports `total_cost_usd`
 (a client-side estimate). Each task's check script decides pass or fail.
@@ -13,7 +13,7 @@ Requires the `claude` CLI and ANTHROPIC_API_KEY (bare mode does not use subscrip
 Running it costs money. Use --dry-run to print the commands without running anything.
 
 Usage:
-    python benchmarks/run_benchmark.py [--tasks T01,T02] [--variants baseline,conductor]
+    python benchmarks/run_benchmark.py [--tasks T01,T02] [--variants baseline,tierly]
                                        [--repeat N] [--baseline-effort low|medium|high]
                                        [--out results.jsonl] [--dry-run]
 """
@@ -34,8 +34,8 @@ from typing import Any
 
 BENCH_DIR = Path(__file__).resolve().parent
 REPO_ROOT = BENCH_DIR.parent
-PLUGIN_DIR = REPO_ROOT / "plugins" / "conductor"
-VARIANTS = ("baseline", "conductor")
+PLUGIN_DIR = REPO_ROOT / "plugins" / "tierly"
+VARIANTS = ("baseline", "tierly")
 DEFAULT_BASELINE_EFFORT = "medium"
 
 
@@ -81,7 +81,7 @@ def build_command(
     """Return the claude CLI argv for one run."""
     if variant not in VARIANTS:
         raise ValueError(f"unknown variant: {variant}")
-    prompt = task.prompt if variant == "baseline" else f"/conductor:conductor --yes {task.prompt}"
+    prompt = task.prompt if variant == "baseline" else f"/tierly:tierly --yes {task.prompt}"
     cmd = [
         "claude", "--bare", "-p", prompt,
         "--model", "opus",
@@ -131,7 +131,7 @@ def run_one(
     task: Task, variant: str, baseline_effort: str = DEFAULT_BASELINE_EFFORT,
 ) -> dict[str, Any]:
     fixture = BENCH_DIR / "fixtures" / task.fixture
-    with tempfile.TemporaryDirectory(prefix=f"conductor-{task.id}-{variant}-") as tmp:
+    with tempfile.TemporaryDirectory(prefix=f"tierly-{task.id}-{variant}-") as tmp:
         workdir = Path(tmp) / task.fixture
         shutil.copytree(fixture, workdir)
         started = time.time()
@@ -185,7 +185,7 @@ def summarize(rows: list[dict[str, Any]]) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run the Conductor benchmark suite.")
+    parser = argparse.ArgumentParser(description="Run the Tierly benchmark suite.")
     parser.add_argument("--tasks", default="", help="comma-separated task ids (default: all)")
     parser.add_argument("--variants", default=",".join(VARIANTS))
     parser.add_argument("--repeat", type=int, default=1, help="runs per task and variant (default: 1)")

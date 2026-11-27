@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: e04-feature-with-tests
+description: Implement and verify a multi-file feature with a user-requested test command.
+expected_outcome: |
+  Tierly lists the test command as an extra action in the plan,
+  creates the stats module and tests, documents the functions in README.md,
+  dispatches a watcher to review every write task under the quality profile,
+  and passes the final pytest run.
+context: {scaffold_script: place-files.sh}
