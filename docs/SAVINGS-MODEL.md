@@ -1,6 +1,6 @@
 # Savings model
 
-How Allot's cost compares with running everything on one model, how it is estimated during a
+How Conductor's cost compares with running everything on one model, how it is estimated during a
 run, and how it is measured.
 
 ## Where cost goes up and down
@@ -15,7 +15,7 @@ run, and how it is measured.
 | Escalations (redoing work one tier up) | up | Proportional to watcher fail rate |
 | Cold starts: subagents re-read files the main session already read | up | Briefs pass paths and findings to limit it |
 
-Allot often uses more tokens in total while costing less. The goal is lower cost at equal
+Conductor often uses more tokens in total while costing less. The goal is lower cost at equal
 quality, not fewer tokens.
 
 ## Illustrative model (not a measurement)
@@ -33,7 +33,7 @@ cache-write price is assumed to be 1.25x its input price.
 | Output | 80,000 | $20.00 | $1.60 |
 | **Total** | 3,430,000 | | **$3.80** |
 
-### Allot run
+### Conductor run
 
 | Role | Model | Uncached in | Cache write | Cache read | Output | Cost |
 |---|---|---|---|---|---|---|
@@ -59,13 +59,13 @@ These are modeled ranges. They become claims only when the benchmark suite repro
 
 ## In-run estimate: the cost index
 
-During a run Allot cannot see token counts (BUILD-SPEC item V1), so the plan and report show a
+During a run Conductor cannot see token counts (BUILD-SPEC item V1), so the plan and report show a
 **relative cost index**: the sum of `cost_index` (Haiku 1, Sonnet 20, Opus 40) for every
 dispatch, next to the index if every dispatch ran on Opus. It ranks plans; it is not a bill.
 
 ## Measured cost: the benchmark suite
 
-`benchmarks/run_benchmark.py` runs each task twice from a clean fixture, baseline and Allot,
+`benchmarks/run_benchmark.py` runs each task twice from a clean fixture, baseline and Conductor,
 with `claude -p --output-format json`, which reports `total_cost_usd` and a per-model breakdown.
 Those figures are client-side estimates and can differ slightly from the bill. Each run's check
 script decides pass or fail. Routing changes are accepted only when pass rate holds and cost does
@@ -75,5 +75,5 @@ not rise.
 
 On Pro and Max plans, subagent requests count toward the same usage limits as the main
 conversation. Moving work to cheaper models is expected to slow how fast limits are used, but
-Anthropic does not publish an exact per-model weighting, so Allot makes no numeric claim for
+Anthropic does not publish an exact per-model weighting, so Conductor makes no numeric claim for
 subscriptions.

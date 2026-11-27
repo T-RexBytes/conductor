@@ -1,6 +1,6 @@
-# Contributing to Allot
+# Contributing to Conductor
 
-Thanks for helping. Allot is used to make decisions about other people's money and code, so the
+Thanks for helping. Conductor is used to make decisions about other people's money and code, so the
 bar for changes is evidence, not opinion. Please read this page before opening a pull request.
 
 ## Ground rules
@@ -23,10 +23,10 @@ python -m pytest -q
 Try the plugin from your clone without installing it:
 
 ```bash
-claude --plugin-dir ./plugins/allot
+claude --plugin-dir ./plugins/conductor
 ```
 
-Then run `/allot:run --plan-only <some task>` in a scratch project.
+Then run `/conductor --plan-only <some task>` in a scratch project.
 
 ## Kinds of change
 
@@ -68,7 +68,7 @@ The PR template repeats this list.
 ## Releases (maintainers)
 
 1. Move "Unreleased" entries in `CHANGELOG.md` under the new version.
-2. Bump `version` in `plugins/allot/.claude-plugin/plugin.json`.
+2. Bump `version` in `plugins/conductor/.claude-plugin/plugin.json`.
 3. Run behavioral evals E1–E10 and the benchmark suite; record results in the release PR.
 4. Merge, tag `vX.Y.Z`, publish a GitHub release with the changelog section.
 

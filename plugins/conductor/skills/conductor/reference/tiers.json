@@ -10,7 +10,7 @@
   "tiers": [
     {
       "id": "scout",
-      "agent": "allot:scout",
+      "agent": "conductor:scout",
       "model": "haiku",
       "effort": "low",
       "score_min": 0,
@@ -22,7 +22,7 @@
     },
     {
       "id": "worker",
-      "agent": "allot:worker",
+      "agent": "conductor:worker",
       "model": "haiku",
       "effort": "medium",
       "score_min": 3,
@@ -34,7 +34,7 @@
     },
     {
       "id": "builder",
-      "agent": "allot:builder",
+      "agent": "conductor:builder",
       "model": "sonnet",
       "effort": "medium",
       "score_min": 5,
@@ -46,7 +46,7 @@
     },
     {
       "id": "builder-plus",
-      "agent": "allot:builder-plus",
+      "agent": "conductor:builder-plus",
       "model": "sonnet",
       "effort": "high",
       "score_min": 8,
@@ -58,7 +58,7 @@
     },
     {
       "id": "architect",
-      "agent": "allot:architect",
+      "agent": "conductor:architect",
       "model": "opus",
       "effort": "high",
       "score_min": 10,
@@ -70,7 +70,7 @@
     }
   ],
   "watcher": {
-    "agent": "allot:watcher",
+    "agent": "conductor:watcher",
     "model": "opus",
     "effort": "high",
     "cost_index": 40

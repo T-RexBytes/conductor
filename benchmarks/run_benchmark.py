@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Allot benchmark harness.
+"""Conductor benchmark harness.
 
 Runs each task twice from a clean copy of its fixture:
 
 * baseline: plain Claude Code on Opus, no plugin
-* allot:    the same prompt through `/allot:run --yes`, with the plugin loaded
+* conductor: the same prompt through `/conductor:conductor --yes`, with the plugin loaded
 
 Both runs use `claude --bare -p ... --output-format json`, which reports `total_cost_usd`
 (a client-side estimate). Each task's check script decides pass or fail.
@@ -13,7 +13,7 @@ Requires the `claude` CLI and ANTHROPIC_API_KEY (bare mode does not use subscrip
 Running it costs money. Use --dry-run to print the commands without running anything.
 
 Usage:
-    python benchmarks/run_benchmark.py [--tasks T01,T02] [--variants baseline,allot]
+    python benchmarks/run_benchmark.py [--tasks T01,T02] [--variants baseline,conductor]
                                        [--out results.jsonl] [--dry-run]
 """
 
@@ -33,8 +33,8 @@ from typing import Any
 
 BENCH_DIR = Path(__file__).resolve().parent
 REPO_ROOT = BENCH_DIR.parent
-PLUGIN_DIR = REPO_ROOT / "plugins" / "allot"
-VARIANTS = ("baseline", "allot")
+PLUGIN_DIR = REPO_ROOT / "plugins" / "conductor"
+VARIANTS = ("baseline", "conductor")
 
 
 @dataclass(frozen=True)
@@ -77,7 +77,7 @@ def build_command(task: Task, variant: str) -> list[str]:
     """Return the claude CLI argv for one run."""
     if variant not in VARIANTS:
         raise ValueError(f"unknown variant: {variant}")
-    prompt = task.prompt if variant == "baseline" else f"/allot:run --yes {task.prompt}"
+    prompt = task.prompt if variant == "baseline" else f"/conductor:conductor --yes {task.prompt}"
     cmd = [
         "claude", "--bare", "-p", prompt,
         "--model", "opus",
@@ -85,7 +85,7 @@ def build_command(task: Task, variant: str) -> list[str]:
         "--permission-mode", "acceptEdits",
         "--allowedTools", task.allowed_tools,
     ]
-    if variant == "allot":
+    if variant == "conductor":
         # The orchestrator dispatches subagents through the Agent tool.
         cmd[cmd.index("--allowedTools") + 1] = f"{task.allowed_tools},Agent"
         cmd += ["--plugin-dir", str(PLUGIN_DIR)]
@@ -123,7 +123,7 @@ def run_check(task: Task, workdir: Path) -> bool:
 
 def run_one(task: Task, variant: str) -> dict[str, Any]:
     fixture = BENCH_DIR / "fixtures" / task.fixture
-    with tempfile.TemporaryDirectory(prefix=f"allot-{task.id}-{variant}-") as tmp:
+    with tempfile.TemporaryDirectory(prefix=f"conductor-{task.id}-{variant}-") as tmp:
         workdir = Path(tmp) / task.fixture
         shutil.copytree(fixture, workdir)
         started = time.time()
@@ -168,7 +168,7 @@ def summarize(rows: list[dict[str, Any]]) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run the Allot benchmark suite.")
+    parser = argparse.ArgumentParser(description="Run the Conductor benchmark suite.")
     parser.add_argument("--tasks", default="", help="comma-separated task ids (default: all)")
     parser.add_argument("--variants", default=",".join(VARIANTS))
     parser.add_argument("--out", type=Path, default=None, help="write JSONL results here")

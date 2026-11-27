@@ -1,7 +1,7 @@
 {
-  "name": "allot",
+  "name": "conductor",
   "version": "0.1.0",
-  "description": "Plan-first, cost-aware orchestration: routes each micro-task to the cheapest Claude model and effort that can do it well, with an independent quality watcher. Runs only when you type /allot:run.",
+  "description": "Conductor: plan-first, cost-aware orchestration: routes each micro-task to the cheapest Claude model and effort that can do it well, with an independent quality watcher. Runs only when you type /conductor.",
   "author": {
     "name": "Subarna Maity"
   },

@@ -20,18 +20,18 @@ the official pricing page for current numbers.
 Ratios used as `cost_index`: Haiku 1, Sonnet 20, Opus 40 (same ratio for input and output at
 prompts up to 100k tokens).
 
-Fable-tier models cost well above Opus and are not used by Allot.
+Fable-tier models cost well above Opus and are not used by Conductor.
 
 ## Effort defaults and guidance (per Anthropic's effort documentation)
 
-| Model | Default effort | Guidance used by Allot |
+| Model | Default effort | Guidance used by Conductor |
 |---|---|---|
-| Opus 5.5 | medium | Set explicitly; Allot uses `high` for architect and watcher |
+| Opus 5.5 | medium | Set explicitly; Conductor uses `high` for architect and watcher |
 | Sonnet 5.5 | high (API) | `medium` for well-specified agentic coding, `high` for harder or longer tasks |
 | Haiku 5.5 | medium | `medium` for most work including agentic coding; `low` for short tool tasks only |
 
-All three support `low`, `medium`, `high`, `xhigh` and `max`. Allot uses only `low`, `medium` and
-`high` in v0.1.
+All three support `low`, `medium`, `high`, `xhigh` and `max`. Conductor uses only `low`, `medium`
+and `high` in v0.1.
 
 ## Sources
 

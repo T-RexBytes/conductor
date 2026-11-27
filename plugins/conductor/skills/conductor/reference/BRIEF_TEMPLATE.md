@@ -4,7 +4,7 @@ Every dispatch uses this structure. The subagent sees nothing but its brief, so 
 stand on its own. Aim for under 400 words plus paths.
 
 ```text
-ALLOT TASK <ID>: <one-line title>
+CONDUCTOR TASK <ID>: <one-line title>
 
 Goal:
 <What to produce and why, in 1 to 3 sentences.>
@@ -31,7 +31,7 @@ Constraints:
 Definition of done:
 - <checkable criteria>
 
-Finish with an ALLOT-REPORT block exactly as specified in your instructions.
+Finish with a CONDUCTOR-REPORT block exactly as specified in your instructions.
 ```
 
 For an escalation, add:

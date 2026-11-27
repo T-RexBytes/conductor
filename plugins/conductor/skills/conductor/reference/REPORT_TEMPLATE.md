@@ -1,14 +1,14 @@
 # Report template
 
 ```text
-Allot report: <one-line outcome>
+Conductor report: <one-line outcome>
 
 Result: <done | partially done | stopped>, <one or two sentences on what the user now has>
 
-| ID | Micro-task | Agent | Model / effort | Status | Watcher | Escalations |
-|----|------------|-------|----------------|--------|---------|-------------|
-| T1 | ...        | allot:scout   | haiku / low     | done | -    | 0 |
-| T2 | ...        | allot:builder | sonnet / medium | done | pass | 1 (from worker) |
+| ID | Micro-task | Agent             | Model / effort | Status | Watcher | Escalations |
+|----|------------|-------------------|----------------|--------|---------|-------------|
+| T1 | ...        | conductor:scout   | haiku / low     | done | -    | 0 |
+| T2 | ...        | conductor:builder | sonnet / medium | done | pass | 1 (from worker) |
 
 Files changed:
 - <path> — <what changed>

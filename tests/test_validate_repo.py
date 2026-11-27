@@ -14,10 +14,10 @@ sys.path.insert(0, str(REPO / "scripts"))
 
 import validate_repo  # noqa: E402
 
-PLUGIN = Path("plugins/allot")
-SKILL = PLUGIN / "skills/run/SKILL.md"
+PLUGIN = Path("plugins/conductor")
+SKILL = PLUGIN / "skills/conductor/SKILL.md"
 AGENTS = PLUGIN / "agents"
-TIERS = PLUGIN / "skills/run/reference/tiers.json"
+TIERS = PLUGIN / "skills/conductor/reference/tiers.json"
 
 
 @pytest.fixture()
@@ -85,12 +85,12 @@ def test_skill_rule_marker_required(repo: Path) -> None:
 
 
 def test_skill_reference_must_exist(repo: Path) -> None:
-    (repo / PLUGIN / "skills/run/reference/ROUTING.md").unlink()
+    (repo / PLUGIN / "skills/conductor/reference/ROUTING.md").unlink()
     assert "referenced file does not exist: reference/ROUTING.md" in errors_for(repo)
 
 
 def test_agent_internal_marker(repo: Path) -> None:
-    replace(repo / AGENTS / "builder.md", "description: Internal to the allot plugin.", "description: Builds things.")
+    replace(repo / AGENTS / "builder.md", "description: Internal to the conductor plugin.", "description: Builds things.")
     assert "description must start with" in errors_for(repo)
 
 
@@ -117,7 +117,7 @@ def test_agent_invalid_effort(repo: Path) -> None:
 
 def test_tiers_must_match_agents(repo: Path) -> None:
     replace(repo / AGENTS / "builder.md", "effort: medium", "effort: high")
-    assert "'allot:builder' effort" in errors_for(repo)
+    assert "'conductor:builder' effort" in errors_for(repo)
 
 
 def test_tiers_bands_contiguous(repo: Path) -> None:

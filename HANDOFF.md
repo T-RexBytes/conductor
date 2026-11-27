@@ -9,10 +9,10 @@
 
 ## 1. What this project is
 
-Allot is a Claude Code plugin. `/allot:run <task>` plans the task, scores each micro-task, routes
-it to the cheapest Claude tier that can do it well (Haiku / Sonnet / Opus subagents at fixed
+Conductor is a Claude Code plugin. `/conductor <task>` plans the task, scores each micro-task,
+routes it to the cheapest Claude tier that can do it well (Haiku / Sonnet / Opus subagents at fixed
 effort levels), reviews non-trivial work with a read-only Opus watcher, escalates failures one
-tier up, and reports. It must never interfere with anything outside `/allot:run`
+tier up, and reports. It must never interfere with anything outside `/conductor`
 (BUILD-SPEC section 6).
 
 ## 2. Work already done (verified)
@@ -22,13 +22,13 @@ tier up, and reports. It must never interfere with anything outside `/allot:run`
 | File | Status |
 |---|---|
 | `.claude-plugin/marketplace.json` | Done |
-| `plugins/allot/.claude-plugin/plugin.json` | Done (version 0.1.0) |
-| `plugins/allot/README.md` | Done (required by the plugin directory) |
-| `plugins/allot/skills/run/SKILL.md` | Done: hard rules, flags, triage, decomposition, scoring, plan approval, dispatch, watcher, escalation, integration, report, failure handling |
-| `plugins/allot/skills/run/reference/tiers.json` | Done: single source of truth for tiers |
-| `plugins/allot/skills/run/reference/ROUTING.md` | Done: rubric, hard floors, watcher policy, worked examples |
-| `plugins/allot/skills/run/reference/{PLAN,BRIEF,REPORT}_TEMPLATE.md`, `WATCHER_RUBRIC.md` | Done |
-| `plugins/allot/agents/{scout,worker,builder,builder-plus,architect,watcher}.md` | Done |
+| `plugins/conductor/.claude-plugin/plugin.json` | Done (version 0.1.0) |
+| `plugins/conductor/README.md` | Done (required by the plugin directory) |
+| `plugins/conductor/skills/conductor/SKILL.md` | Done: hard rules, flags, triage, decomposition, scoring, plan approval, dispatch, watcher, escalation, integration, report, failure handling |
+| `plugins/conductor/skills/conductor/reference/tiers.json` | Done: single source of truth for tiers |
+| `plugins/conductor/skills/conductor/reference/ROUTING.md` | Done: rubric, hard floors, watcher policy, worked examples |
+| `plugins/conductor/skills/conductor/reference/{PLAN,BRIEF,REPORT}_TEMPLATE.md`, `WATCHER_RUBRIC.md` | Done |
+| `plugins/conductor/agents/{scout,worker,builder,builder-plus,architect,watcher}.md` | Done |
 
 ### Docs (done)
 
@@ -56,14 +56,14 @@ tier up, and reports. It must never interfere with anything outside `/allot:run`
 - `codespell` → clean
 - Relative link and anchor check → 0 problems
 - `claude plugin validate .` → passed (Claude Code 2.1.332)
-- `claude plugin validate ./plugins/allot --profile directory` → passed, 1 warning (no icon)
+- `claude plugin validate ./plugins/conductor --profile directory` → passed, 1 warning (no icon)
 
 Facts confirmed by those runs:
 
 - `claude plugin validate` works **without authentication** (closes BUILD-SPEC item V5).
-- The plugin exposes `allot:run`, `allot:scout`, `allot:worker`, `allot:builder`,
-  `allot:builder-plus`, `allot:architect`, `allot:watcher` (supports item V2; dispatch still to be
-  tested in a live session).
+- The plugin exposes `/conductor`, `conductor:scout`, `conductor:worker`, `conductor:builder`,
+  `conductor:builder-plus`, `conductor:architect`, `conductor:watcher` (supports item V2;
+  dispatch still to be tested in a live session).
 
 ## 3. Start here: next tasks, in order
 
@@ -73,10 +73,10 @@ Do them in this order. After each one, run `python scripts/validate_repo.py` and
 ### Step 1: Finish the paperwork from this snapshot (small)
 
 1. In `docs/BUILD-SPEC.md` section 13, mark **V5 resolved** (validate runs without auth) and
-   record for **V2** that the validator lists the agents as `allot:<name>`; a live dispatch test
+   record for **V2** that the validator lists the agents as `conductor:<name>`; a live dispatch test
    is still needed.
 2. In `.github/workflows/ci.yml`, change the plugin step to
-   `claude plugin validate ./plugins/allot --profile directory`.
+   `claude plugin validate ./plugins/conductor --profile directory`.
 3. Commit: `chore: record verification results and tighten plugin validation`.
 
 ### Step 2: Put the repo on GitHub (milestone M1)
@@ -84,13 +84,13 @@ Do them in this order. After each one, run `python scripts/validate_repo.py` and
 1. `git init`, commit, push to `T-RexBytes/conductor`.
 2. Confirm all CI jobs pass on GitHub. If `markdownlint-cli2-action@v19` or another action version
    fails to resolve, bump it to the latest major and note it in the commit.
-3. Before publishing widely, check that the name "allot" is not taken on GitHub or in the Claude
+3. Before publishing widely, check that the name "conductor" is not taken on GitHub or in the Claude
    plugin directory. If it is, rename consistently (the validator's `PLUGIN_NAME`, manifests,
    agent descriptions, `tiers.json` agent refs, SKILL.md, docs).
 
 ### Step 3: Live verification (milestones M2–M5)
 
-Run Claude Code with `claude --plugin-dir ./plugins/allot` in a scratch project and work through
+Run Claude Code with `claude --plugin-dir ./plugins/conductor` in a scratch project and work through
 the behavioral evals **E1–E10** in `docs/BUILD-SPEC.md` section 11.2. Record each result.
 
 While doing that, answer the open verification items and update BUILD-SPEC section 13:
@@ -98,7 +98,7 @@ While doing that, answer the open verification items and update BUILD-SPEC secti
 | Item | How to check |
 |---|---|
 | V1 | After a dispatch, see whether the Agent tool result shows token usage to the orchestrator |
-| V2 | Confirm `/allot:run` actually dispatches `allot:scout` etc. by those names |
+| V2 | Confirm `/conductor` actually dispatches `conductor:scout` etc. by those names |
 | V3 | Approve a plan via the question card, then check the orchestrator is still on Opus |
 | V4 | If possible, test with an account or setting without Opus access |
 
@@ -107,25 +107,26 @@ If any eval fails, fix SKILL.md, the agent or the reference file, then re-run th
 ### Step 4: Benchmarks (milestone M6)
 
 1. With `ANTHROPIC_API_KEY` set, run `python benchmarks/run_benchmark.py --out results.jsonl`.
-2. Acceptance: Allot pass rate equals baseline, total cost lower (MVP criteria A3, A4).
+2. Acceptance: Conductor pass rate equals baseline, total cost lower (MVP criteria A3, A4).
 3. If `total_cost_usd` or the per-model field names differ from what `parse_result()` expects,
    update the harness and its tests.
 4. Add more tasks (target 10+, mixed kinds) following `benchmarks/README.md`.
 
 ### Step 5: Release (milestone M7)
 
-1. Add a square PNG icon at `plugins/allot/.claude-plugin/icon.png` (512–2048 px, under 2 MB).
+1. Add a square PNG icon at `plugins/conductor/.claude-plugin/icon.png` (512–2048 px, under 2 MB).
    The plugin directory keeps only the first icon submitted, so use the final design.
 2. Replace modeled savings ranges in README with measured results once benchmarks support them.
 3. Tick every box in `docs/MVP.md` section 5, update `CHANGELOG.md`, tag `v0.1.0`.
 
 ## 4. Decisions already made (do not reopen without an issue)
 
-- **Name:** Allot. "Conductor", "Tierward" and "Cadre" were rejected; the last two are taken.
+- **Name:** Conductor (final, chosen by the maintainer on 2026-11-27). "Allot" was the
+  working name. "Tierward" and "Cadre" were rejected because they are taken.
 - **Claude-first.** Other providers (Codex, Gemini) are v0.3 "Bridges", opt-in only.
 - **No hooks at all.** Plugin hooks fire every session, and skill-frontmatter hooks stay
   registered after the skill runs. Both would break non-interference.
-- **No probing.** Allot never runs web, network or shell actions for its own purposes.
+- **No probing.** Conductor never runs web, network or shell actions for its own purposes.
 - **`disallowedTools` only, never `tools` allowlists,** so the user's MCP tools stay available.
 - **Model aliases** (`haiku`, `sonnet`, `opus`), not pinned IDs. Effort only `low|medium|high` in
   v0.1.

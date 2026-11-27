@@ -1,14 +1,14 @@
 {
-  "name": "allot",
-  "description": "Allot: cost-aware, plan-first subagent orchestration for Claude Code.",
+  "name": "conductor",
+  "description": "Conductor: cost-aware, plan-first subagent orchestration for Claude Code.",
   "owner": {
     "name": "Subarna Maity"
   },
   "plugins": [
     {
-      "name": "allot",
-      "source": "./plugins/allot",
-      "description": "Routes each micro-task to the cheapest Claude model and effort that can do it well, verifies the work with a watcher, and reports. Runs only when you type /allot:run."
+      "name": "conductor",
+      "source": "./plugins/conductor",
+      "description": "Routes each micro-task to the cheapest Claude model and effort that can do it well, verifies the work with a watcher, and reports. Runs only when you type /conductor."
     }
   ]
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static checks for the Allot repository.
+"""Static checks for the Conductor repository.
 
 Enforces the manifest, frontmatter, routing and non-interference rules in
 docs/BUILD-SPEC.md section 10.2. Standard library plus PyYAML; no network access.
@@ -21,8 +21,8 @@ from typing import Any
 
 import yaml
 
-PLUGIN_NAME = "allot"
-INTERNAL_MARKER = "Internal to the allot plugin"
+PLUGIN_NAME = "conductor"
+INTERNAL_MARKER = "Internal to the conductor plugin"
 
 # Documented Claude Code skill frontmatter keys (code.claude.com/docs/en/skills).
 SKILL_KEYS = {
@@ -36,11 +36,11 @@ AGENT_KEYS = {
     "name", "description", "model", "effort", "maxTurns", "tools", "disallowedTools",
     "skills", "memory", "background", "omitClaudeMd", "isolation", "color", "experimental",
 }
-# Keys Allot agents must never use (ignored for plugin agents, or break non-interference).
+# Keys Conductor agents must never use (ignored for plugin agents, or break non-interference).
 AGENT_BANNED_KEYS = {"tools", "permissionMode", "hooks", "mcpServers", "initialPrompt"}
 
 EFFORT_LEVELS = {"low", "medium", "high", "xhigh", "max"}
-ALLOT_MODELS = {"haiku", "sonnet", "opus"}
+ALLOWED_MODELS = {"haiku", "sonnet", "opus"}
 COLORS = {"red", "blue", "green", "yellow", "purple", "orange", "pink", "cyan"}
 READ_ONLY_DENY = {"Write", "Edit", "NotebookEdit", "Agent"}
 EXPECTED_AGENTS = {"scout", "worker", "builder", "builder-plus", "architect", "watcher"}
@@ -163,8 +163,8 @@ def check_forbidden_paths(plugin_dir: Path, rep: Report) -> None:
 
 
 def check_skill(plugin_dir: Path, rep: Report) -> None:
-    skill = plugin_dir / "skills" / "run" / "SKILL.md"
-    where = f"plugins/{PLUGIN_NAME}/skills/run/SKILL.md"
+    skill = plugin_dir / "skills" / "conductor" / "SKILL.md"
+    where = f"plugins/{PLUGIN_NAME}/skills/conductor/SKILL.md"
     if not skill.exists():
         rep.error(where, "file not found")
         return
@@ -181,8 +181,8 @@ def check_skill(plugin_dir: Path, rep: Report) -> None:
         rep.error(where, "skill hooks persist for the session; not allowed (N2)")
     if "disallowed-tools" in meta:
         rep.error(where, "disallowed-tools would hide the user's tools (N5)")
-    if meta.get("model") not in ALLOT_MODELS:
-        rep.error(where, f"model must be one of {sorted(ALLOT_MODELS)}")
+    if meta.get("model") not in ALLOWED_MODELS:
+        rep.error(where, f"model must be one of {sorted(ALLOWED_MODELS)}")
     if meta.get("effort") not in EFFORT_LEVELS:
         rep.error(where, f"effort must be one of {sorted(EFFORT_LEVELS)}")
     description = str(meta.get("description", "")) + str(meta.get("when_to_use", ""))
@@ -224,8 +224,8 @@ def check_agents(plugin_dir: Path, rep: Report) -> dict[str, dict[str, Any]]:
             rep.error(where, f"banned keys: {sorted(banned)}")
         if not str(meta.get("description", "")).startswith(INTERNAL_MARKER):
             rep.error(where, f"description must start with '{INTERNAL_MARKER}' (N4)")
-        if meta.get("model") not in ALLOT_MODELS:
-            rep.error(where, f"model must be one of {sorted(ALLOT_MODELS)}")
+        if meta.get("model") not in ALLOWED_MODELS:
+            rep.error(where, f"model must be one of {sorted(ALLOWED_MODELS)}")
         if meta.get("effort") not in EFFORT_LEVELS:
             rep.error(where, f"effort must be one of {sorted(EFFORT_LEVELS)}")
         max_turns = meta.get("maxTurns")
@@ -238,7 +238,7 @@ def check_agents(plugin_dir: Path, rep: Report) -> dict[str, dict[str, Any]]:
             rep.error(where, "disallowedTools must include Agent (N10)")
         if name in {"scout", "watcher"} and not READ_ONLY_DENY <= denied:
             rep.error(where, f"read-only agent must deny {sorted(READ_ONLY_DENY)}")
-        marker = "ALLOT-VERDICT" if name == "watcher" else "ALLOT-REPORT"
+        marker = "CONDUCTOR-VERDICT" if name == "watcher" else "CONDUCTOR-REPORT"
         if marker not in body:
             rep.error(where, f"body must define the {marker} output contract")
         if isinstance(name, str):
@@ -250,7 +250,7 @@ def check_agents(plugin_dir: Path, rep: Report) -> dict[str, dict[str, Any]]:
 
 
 def check_tiers(plugin_dir: Path, agents: dict[str, dict[str, Any]], rep: Report) -> None:
-    path = plugin_dir / "skills" / "run" / "reference" / "tiers.json"
+    path = plugin_dir / "skills" / "conductor" / "reference" / "tiers.json"
     where = "tiers.json"
     data = load_json(path, rep)
     if data is None:

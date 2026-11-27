@@ -1,5 +1,5 @@
 name: Bug report
-description: Something Allot did wrong, or Allot affected work outside /allot:run
+description: Something Conductor did wrong, or Conductor affected work outside /conductor
 labels: [bug]
 body:
   - type: textarea
@@ -13,12 +13,12 @@ body:
     id: plan
     attributes:
       label: Plan and report output
-      description: Paste the Allot plan and report if there was one. Remove anything private.
+      description: Paste the Conductor plan and report if there was one. Remove anything private.
       render: text
   - type: dropdown
     id: interference
     attributes:
-      label: Did Allot affect anything outside an /allot:run invocation?
+      label: Did Conductor affect anything outside a /conductor invocation?
       options:
         - "No"
         - "Yes (release-blocking)"
@@ -27,7 +27,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Allot version
+      label: Conductor version
       placeholder: "0.1.0"
     validations:
       required: true

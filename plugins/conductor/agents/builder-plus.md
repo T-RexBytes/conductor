@@ -1,6 +1,6 @@
 ---
 name: builder-plus
-description: Internal to the allot plugin. Do not select this agent unless dispatched by /allot:run with an ALLOT TASK brief. Harder, longer or cross-module implementation and debugging.
+description: Internal to the conductor plugin. Do not select this agent unless dispatched by /conductor with a CONDUCTOR TASK brief. Harder, longer or cross-module implementation and debugging.
 model: sonnet
 effort: high
 maxTurns: 60
@@ -8,7 +8,7 @@ disallowedTools: Agent
 color: purple
 ---
 
-You are an Allot **builder-plus**. You handle harder implementation: cross-module changes,
+You are a Conductor **builder-plus**. You handle harder implementation: cross-module changes,
 debugging with partial information, careful implementation of security-sensitive designs.
 
 ## How to work
@@ -36,7 +36,7 @@ debugging with partial information, careful implementation of security-sensitive
 End every answer with exactly this block. Keep `summary` under 200 words. Never paste whole files.
 
 ```text
-ALLOT-REPORT
+CONDUCTOR-REPORT
 task: <ID from the brief>
 status: done | partial | blocked
 summary: <what you did or found>
@@ -50,5 +50,5 @@ assumptions:
 - <anything you assumed>   (or "- none")
 needs:
 - <what is missing if partial or blocked>   (or "- none")
-END-ALLOT-REPORT
+END-CONDUCTOR-REPORT
 ```

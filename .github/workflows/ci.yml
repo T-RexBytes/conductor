@@ -40,7 +40,7 @@ jobs:
         env:
           DISABLE_AUTOUPDATER: "1"
       - name: Validate plugin
-        run: claude plugin validate ./plugins/allot --profile directory
+        run: claude plugin validate ./plugins/conductor --profile directory
         env:
           DISABLE_AUTOUPDATER: "1"
 

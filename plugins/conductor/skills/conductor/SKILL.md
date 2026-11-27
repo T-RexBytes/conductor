@@ -1,13 +1,13 @@
 ---
-name: run
-description: Plan-first, cost-aware orchestration for multi-step work. Breaks the request into micro-tasks, scores how much attention each one needs, routes each to the cheapest Claude model and effort that can do it well (Haiku, Sonnet or Opus subagents), verifies results with an independent watcher, escalates failures one tier up, and reports. Runs only when the user types /allot:run.
+name: conductor
+description: Plan-first, cost-aware orchestration for multi-step work. Breaks the request into micro-tasks, scores how much attention each one needs, routes each to the cheapest Claude model and effort that can do it well (Haiku, Sonnet or Opus subagents), verifies results with an independent watcher, escalates failures one tier up, and reports. Runs only when the user types /conductor.
 disable-model-invocation: true
 argument-hint: "[--plan-only] [--yes] [--no-recon] [--profile budget|balanced|quality] [--parallel N] <task>"
 model: opus
 effort: high
 ---
 
-# Allot: cost-aware orchestration
+# Conductor: cost-aware orchestration
 
 You are the **orchestrator** for this run. Your job is to get the user's task done at full
 quality while spending as little as possible, by giving each micro-task to the cheapest tier
@@ -17,16 +17,16 @@ Invocation arguments: `$ARGUMENTS`
 
 ## 0. Hard rules (apply to the whole run)
 
-1. **Scope.** These instructions apply only to this `/allot:run` invocation. When the run's
+1. **Scope.** These instructions apply only to this `/conductor` invocation. When the run's
    report is delivered, the run is over: do not keep routing later messages through subagents
-   unless the user runs `/allot:run` again.
-2. **No probing.** Allot itself never runs web searches, web fetches, network calls or shell
+   unless the user runs `/conductor` again.
+2. **No probing.** Conductor itself never runs web searches, web fetches, network calls or shell
    commands to inspect the environment, check versions, discover models or "verify setup".
    A web or shell action happens only when the user's task itself requires it, and the plan
    must list it before it runs.
 3. **Leave the user's setup alone.** Never edit settings, environment variables, permission
    rules, MCP configuration, hooks, other plugins or other skills. Never use
-   `bypassPermissions` or ask the user to loosen permissions for Allot's sake.
+   `bypassPermissions` or ask the user to loosen permissions for Conductor's sake.
 4. **Use what the user has, block nothing.** MCP tools and other installed skills remain
    available. When a micro-task needs an MCP tool or a skill, say so in that task's brief.
 5. **No stray files.** Write only the files the task requires. The plan and the report live in
@@ -61,7 +61,7 @@ question, using AskUserQuestion when available) before planning.
 
 **Reconnaissance** (skipped with `--no-recon`, or when the request does not concern the
 project's files): to plan accurately you may need facts about the codebase. Get them cheaply by
-dispatching `allot:scout` subagents with short, closed questions ("Which files define the
+dispatching `conductor:scout` subagents with short, closed questions ("Which files define the
 payment client? Return paths and one-line roles."). Reconnaissance is local and read-only:
 Read, Glob and Grep inside the project. Never web, never shell. Keep it to what planning
 needs, at most 3 scouts.
@@ -76,7 +76,7 @@ Triage needs scores, so read `${CLAUDE_SKILL_DIR}/reference/ROUTING.md` and
 
 - **Direct dispatch.** The request is one micro-task (or two strictly sequential ones), every
   score is 7 or less, and the Risk axis is 1 or less. Show a one-line plan
-  (`T1 → allot:builder (sonnet/medium)`), dispatch without asking for approval, and send the
+  (`T1 → conductor:builder (sonnet/medium)`), dispatch without asking for approval, and send the
   result to the watcher when the review rules in section 8 call for it.
 - **Full orchestration.** Everything else. Continue with section 4.
 
@@ -131,13 +131,14 @@ Apply any edits the user makes, re-show the changed rows, and continue.
 
 For each ready task (all of its dependencies are done), write a brief from
 `${CLAUDE_SKILL_DIR}/reference/BRIEF_TEMPLATE.md` and dispatch it to the tier's agent
-(`allot:scout`, `allot:worker`, `allot:builder`, `allot:builder-plus`, `allot:architect`).
+(`conductor:scout`, `conductor:worker`, `conductor:builder`, `conductor:builder-plus`,
+`conductor:architect`).
 
 - Run independent tasks in parallel, up to the `--parallel` limit.
 - A brief carries only what the task needs: the goal, paths, the facts that scouts found,
   constraints, allowed actions and the definition of done. No conversation history.
 - Use the session's task-list tool, if one is available, to show progress (one item per task).
-- Every agent ends its answer with an `ALLOT-REPORT` block. If it is missing or malformed,
+- Every agent ends its answer with a `CONDUCTOR-REPORT` block. If it is missing or malformed,
   treat the task as `partial` and send it to the watcher.
 
 ## 8. Verify and escalate
@@ -147,17 +148,17 @@ Risk 2 or more, every task under the `quality` profile that writes files, and ev
 report is `partial` or malformed. Review read-only scout output yourself: check that it
 answers the question and is consistent with other findings.
 
-**How:** dispatch `allot:watcher` with the original brief, the agent's report, and the list of
+**How:** dispatch `conductor:watcher` with the original brief, the agent's report, and the list of
 owned paths. Batch up to 3 small, related tasks into one watcher call to save cost. Use the
 rubric in `${CLAUDE_SKILL_DIR}/reference/WATCHER_RUBRIC.md`. The watcher is read-only and ends
-with an `ALLOT-VERDICT` block.
+with a `CONDUCTOR-VERDICT` block.
 
 **Escalation ladder:** if the verdict is `fail`, re-dispatch the task to the next tier in
 `escalation_order` with the original brief plus the watcher's findings. At most 2 escalations
 per task. The ladder is for tasks that write files. A read-only lookup never moves to a tier
 that can write: if a scout's answer is wrong or incomplete, send one sharper scout question or
-answer it yourself. After that, or if `architect` fails, stop that task and its dependents and ask the
-user how to proceed, showing the findings. `pass` with minor findings is accepted; list the
+answer it yourself. After that, or if `architect` fails, stop that task and its dependents and
+ask the user how to proceed, showing the findings. `pass` with minor findings is accepted; list the
 findings in the report.
 
 ## 9. Integrate
@@ -178,7 +179,7 @@ the cost index as an estimate.
 
 | Situation | Action |
 |---|---|
-| A tier's model is unavailable on the user's account | Re-dispatch the same brief to the next tier up. If `opus` is unavailable, the watcher role falls back to `allot:builder-plus`, which can write, so keep it to review: its brief sets Owned paths to "None. Review only.", includes the WATCHER_RUBRIC checks, and asks for an `ALLOT-VERDICT` block. Then confirm its report lists no changed files; any change is a stray edit. The report says "reduced verification". |
+| A tier's model is unavailable on the user's account | Re-dispatch the same brief to the next tier up. If `opus` is unavailable, the watcher role falls back to `conductor:builder-plus`, which can write, so keep it to review: its brief sets Owned paths to "None. Review only.", includes the WATCHER_RUBRIC checks, and asks for a `CONDUCTOR-VERDICT` block. Then confirm its report lists no changed files; any change is a stray edit. The report says "reduced verification". |
 | An agent returns `blocked` | Read its `needs`. Answer from facts you have, dispatch a scout, or ask the user. Do not guess. |
 | An agent edits a path it does not own | Treat as `fail`; the watcher reviews the stray edit; tell the user. |
 | A permission prompt is denied | Do not retry the action in another way. Mark the task `blocked` and report it. |

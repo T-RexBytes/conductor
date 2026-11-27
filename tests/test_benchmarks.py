@@ -34,15 +34,15 @@ def test_unknown_task_id_rejected() -> None:
 def test_build_command_variants() -> None:
     task = rb.load_tasks({"T01"})[0]
     base = rb.build_command(task, "baseline")
-    allot = rb.build_command(task, "allot")
+    conductor = rb.build_command(task, "conductor")
     assert base[:3] == ["claude", "--bare", "-p"]
     assert base[3] == task.prompt
     assert "--plugin-dir" not in base
-    assert allot[3].startswith("/allot:run --yes ")
-    assert allot[allot.index("--plugin-dir") + 1] == str(rb.PLUGIN_DIR)
+    assert conductor[3].startswith("/conductor:conductor --yes ")
+    assert conductor[conductor.index("--plugin-dir") + 1] == str(rb.PLUGIN_DIR)
     assert base[base.index("--allowedTools") + 1] == task.allowed_tools
-    assert allot[allot.index("--allowedTools") + 1] == f"{task.allowed_tools},Agent"
-    for cmd in (base, allot):
+    assert conductor[conductor.index("--allowedTools") + 1] == f"{task.allowed_tools},Agent"
+    for cmd in (base, conductor):
         assert cmd[cmd.index("--output-format") + 1] == "json"
         assert cmd[cmd.index("--model") + 1] == "opus"
     with pytest.raises(ValueError):
@@ -69,11 +69,11 @@ def test_parse_result_bad_output(bad: str) -> None:
 def test_summarize_table() -> None:
     rows = [
         {"task": "T01", "variant": "baseline", "passed": True, "total_cost_usd": 1.0, "wall_s": 10},
-        {"task": "T01", "variant": "allot", "passed": True, "total_cost_usd": 0.6, "wall_s": 12},
+        {"task": "T01", "variant": "conductor", "passed": True, "total_cost_usd": 0.6, "wall_s": 12},
     ]
     text = rb.summarize(rows)
     assert "| baseline | 1/1 | 1.0000 |" in text
-    assert "| allot | 1/1 | 0.6000 |" in text
+    assert "| conductor | 1/1 | 0.6000 |" in text
 
 
 def test_dry_run_runs_nothing(capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch) -> None:
@@ -84,7 +84,7 @@ def test_dry_run_runs_nothing(capsys: pytest.CaptureFixture[str], monkeypatch: p
     assert rb.main(["--dry-run", "--tasks", "T01"]) == 0
     out = capsys.readouterr().out
     assert "[T01 baseline] claude --bare -p" in out
-    assert "[T01 allot] claude --bare -p '/allot:run --yes" in out
+    assert "[T01 conductor] claude --bare -p '/conductor:conductor --yes" in out
 
 
 def _run_check(task_id: str, workdir: Path) -> int:

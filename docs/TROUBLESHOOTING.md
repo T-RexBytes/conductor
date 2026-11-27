@@ -1,22 +1,23 @@
 # Troubleshooting
 
-## `/allot:run` does not appear in the `/` menu
+## `/conductor` does not appear in the `/` menu
 
-- Run `/plugin` and check that `allot@allot` is installed and enabled.
+- If `/conductor` is taken by another command, type `/conductor:conductor`.
+- Run `/plugin` and check that `conductor@conductor` is installed and enabled.
 - Run `/reload-plugins` or start a new session.
-- If you installed from a local clone, run `claude plugin validate ./plugins/allot` and fix any
+- If you installed from a local clone, run `claude plugin validate ./plugins/conductor` and fix any
   error it reports.
 
-## Claude never uses Allot unless I type the command
+## Claude never uses Conductor unless I type the command
 
-That is intended (guarantee N1). Allot is invoked only by `/allot:run`.
+That is intended (guarantee N1). Conductor is invoked only by `/conductor`.
 
 ## Every subagent seems to run on the same model
 
 Check whether `CLAUDE_CODE_SUBAGENT_MODEL` and `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` are set in your
 environment or settings. With the force variable on, Claude Code ignores agent `model` fields,
-so Allot's routing cannot take effect. Allot does not change this for you; unset it yourself if
-you want routing.
+so Conductor's routing cannot take effect. Conductor does not change this for you; unset it yourself
+if you want routing.
 
 ## The report says "reduced verification"
 
@@ -36,8 +37,8 @@ report lists what. Answer it, then rerun the remaining work.
 
 ## A permission prompt appeared during a run
 
-Allot works under your normal permission rules and never bypasses them. Approve or deny as usual.
-A denied action marks that task as blocked; Allot does not try another way around it.
+Conductor works under your normal permission rules and never bypasses them. Approve or deny as
+usual. A denied action marks that task as blocked; Conductor does not try another way around it.
 
 ## Costs look higher than expected
 

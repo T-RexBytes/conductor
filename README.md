@@ -1,11 +1,11 @@
-# Allot
+# Conductor
 
-**Cost-aware, plan-first orchestration for Claude Code.** Allot breaks your task into
+**Cost-aware, plan-first orchestration for Claude Code.** Conductor breaks your task into
 micro-tasks, gives each one to the cheapest Claude model and effort level that can do it well,
 checks the work with an independent reviewer, and tells you what ran where.
 
 ```text
-/allot:run add pagination to the orders API, with tests that pass
+/conductor add pagination to the orders API, with tests that pass
 ```
 
 [![CI](https://github.com/T-RexBytes/conductor/actions/workflows/ci.yml/badge.svg)](https://github.com/T-RexBytes/conductor/actions/workflows/ci.yml)
@@ -16,7 +16,7 @@ checks the work with an independent reviewer, and tells you what ran where.
 
 One Claude Code session usually runs every step on one model. Searching for a symbol then costs
 as much per token as designing a migration. Per-token prices across Claude models differ by up
-to 40x, so routine steps are where most of the waste is. Allot moves routine steps down to Haiku
+to 40x, so routine steps are where most of the waste is. Conductor moves routine steps down to Haiku
 and Sonnet, keeps judgment on Opus, and has an Opus watcher check anything that matters.
 
 ## Install
@@ -25,14 +25,16 @@ In Claude Code:
 
 ```text
 /plugin marketplace add T-RexBytes/conductor
-/plugin install allot@allot
+/plugin install conductor@conductor
 ```
 
 ## Use
 
 ```text
-/allot:run [--plan-only] [--yes] [--no-recon] [--profile budget|balanced|quality] [--parallel N] <task>
+/conductor [--plan-only] [--yes] [--no-recon] [--profile budget|balanced|quality] [--parallel N] <task>
 ```
+
+If `/conductor` is taken by another command, type `/conductor:conductor`.
 
 | Flag | Effect | Default |
 |---|---|---|
@@ -44,7 +46,7 @@ In Claude Code:
 
 What happens:
 
-1. **Understand.** Allot restates your goal and asks one question if something important is
+1. **Understand.** Conductor restates your goal and asks one question if something important is
    unclear.
 2. **Triage.** Small requests go straight to the right agent, with no plan to approve.
 3. **Plan.** Larger work is split into micro-tasks. Each is scored 0–3 on complexity,
@@ -52,7 +54,7 @@ What happens:
    cancel it.
 4. **Run.** Independent tasks run in parallel. Each subagent gets a self-contained brief.
 5. **Check.** A read-only Opus watcher reviews every non-trivial change. Failed work is redone one
-   tier up, at most twice, and then Allot asks you.
+   tier up, at most twice, and then Conductor asks you.
 6. **Report.** Outcome, files changed, what ran on which model, and a relative cost estimate.
 
 ## Routing
@@ -68,11 +70,11 @@ What happens:
 
 Hard rules override the score: anything security-, payment- or data-destructive goes to
 architect (design) or builder-plus (implementation) with mandatory review, and large-context work
-never goes to Haiku. Details: [ROUTING.md](plugins/allot/skills/run/reference/ROUTING.md).
+never goes to Haiku. Details: [ROUTING.md](plugins/conductor/skills/conductor/reference/ROUTING.md).
 
-## What Allot will never do
+## What Conductor will never do
 
-- Run unless you type `/allot:run`.
+- Run unless you type `/conductor`.
 - Install hooks, change settings, permissions, environment variables, MCP servers or other
   plugins.
 - Hide your MCP tools or skills from the work. Subagents can use them when a task needs them.
@@ -93,7 +95,7 @@ measured; benchmark results will replace these):
 | Mixed feature work | 25–40% lower |
 | Judgment-heavy | 0–15% lower |
 
-Allot often uses *more* tokens in total while costing less, because most tokens move to cheaper
+Conductor often uses *more* tokens in total while costing less, because most tokens move to cheaper
 models. The report shows a relative cost index, not a bill. On a subscription, subagent usage
 counts toward the same limits as your main conversation. See
 [docs/SAVINGS-MODEL.md](docs/SAVINGS-MODEL.md).
