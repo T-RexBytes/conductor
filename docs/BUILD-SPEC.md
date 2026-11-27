@@ -432,12 +432,12 @@ in a real session and the result recorded in the release PR.
 | V4 | What happens when the account cannot use Opus? | Document the behavior; the skill's fallback already covers agents |
 | V5 | Does `claude plugin validate` run in CI without authentication? | Make the job optional and rely on `validate_repo.py` |
 
-Status on 2026-11-27 (Claude Code 2.1.332):
+Status on 2026-11-28 (Claude Code 2.1.332):
 
 | ID | Status | Notes |
 |---|---|---|
 | V1 | Open | Needs a live run |
-| V2 | Partly checked | `claude plugin validate` lists the agents as `tierly:scout`, `tierly:worker`, `tierly:builder`, `tierly:builder-plus`, `tierly:architect` and `tierly:watcher`. A live dispatch test is still needed |
+| V2 | Resolved: yes | Live eval runs on 2026-11-27 (E3) dispatched `tierly:worker` by that name through the Agent tool, and it ran |
 | V3 | Open | Needs an interactive run |
 | V4 | Open | Needs an account or setting without Opus access |
 | V5 | Resolved: yes | `claude plugin validate` runs without authentication, so the CI job stays required |
