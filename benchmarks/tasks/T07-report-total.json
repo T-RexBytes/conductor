@@ -1,0 +1,10 @@
+{
+  "id": "T07",
+  "title": "Reconcile the stock report total",
+  "kind": "judgment-heavy",
+  "fixture": "inventory",
+  "prompt": "For some inventories the total value printed by stock_report() differs by a cent from order_total() for the same items, with no discount and no tax. Find the cause and fix it so the report total always matches. Add a regression test. All tests must pass with python -m pytest -q.",
+  "allowed_tools": "Read,Edit,Write,Glob,Grep,Bash(python -m pytest *)",
+  "check": "checks/check_t07.py",
+  "timeout_s": 1200
+}

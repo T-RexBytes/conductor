@@ -1,0 +1,10 @@
+{
+  "id": "T10",
+  "title": "Audit inventory money handling",
+  "kind": "read-heavy",
+  "fixture": "inventory",
+  "prompt": "Audit inventory/ for money-handling problems, including float arithmetic on prices and inconsistent rounding. Write docs/MONEY-AUDIT.md with one finding per line in the form path:line - issue. Do not modify any Python files.",
+  "allowed_tools": "Read,Write,Glob,Grep",
+  "check": "checks/check_t10.py",
+  "timeout_s": 1200
+}

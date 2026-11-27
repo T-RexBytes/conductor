@@ -1,0 +1,10 @@
+{
+  "id": "T09",
+  "title": "Add stock reservations",
+  "kind": "judgment-heavy",
+  "fixture": "inventory",
+  "prompt": "Add stock reservations to Store. reserve(sku, quantity, ttl_seconds, now) -> str returns a reservation ID and makes that quantity unavailable to later reservations. Reservation IDs must be unique among active reservations. Add release(reservation_id) and available(sku, now) -> int. Availability is tracked per SKU and excludes active reservations. Releasing a reservation restores its quantity to availability. Releasing a reservation ID that was already released raises ValueError. Reservations expire at now >= created + ttl_seconds. TTLs may be fractional seconds. Time is always passed in as now (float seconds). Never read the system clock. Reject invalid quantities, unknown SKUs, over-reservation, and unknown reservation IDs with ValueError. Quantities must be positive integers; bool values are rejected. Failed reservations leave availability unchanged. Calling available for an unknown or removed SKU raises ValueError. Keep the existing remove_item behavior. Write a short design note in docs/RESERVATIONS.md stating the invariants, and add tests. All tests must pass with python -m pytest -q.",
+  "allowed_tools": "Read,Edit,Write,Glob,Grep,Bash(python -m pytest *)",
+  "check": "checks/check_t09.py",
+  "timeout_s": 1200
+}

@@ -1,0 +1,10 @@
+{
+  "id": "T08",
+  "title": "Share SKU validation",
+  "kind": "mixed",
+  "fixture": "inventory",
+  "prompt": "SKU validation is duplicated in inventory/store.py and inventory/pricing.py. Move it into a new module inventory/validation.py exposing validate_sku(sku: str) -> str, which returns the normalized SKU or raises ValueError. Use it from both modules and keep behavior identical. All tests must pass with python -m pytest -q.",
+  "allowed_tools": "Read,Edit,Write,Glob,Grep,Bash(python -m pytest *)",
+  "check": "checks/check_t08.py",
+  "timeout_s": 1200
+}
