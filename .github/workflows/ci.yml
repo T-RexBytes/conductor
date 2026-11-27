@@ -40,7 +40,13 @@ jobs:
         env:
           DISABLE_AUTOUPDATER: "1"
       - name: Validate plugin
-        run: claude plugin validate ./plugins/tierly --profile directory
+        run: |
+          # --profile needs a newer CLI than npm may ship; fall back to the standard checks.
+          if claude plugin validate --help | grep -q -- '--profile'; then
+            claude plugin validate ./plugins/tierly --profile directory
+          else
+            claude plugin validate ./plugins/tierly
+          fi
         env:
           DISABLE_AUTOUPDATER: "1"
 
