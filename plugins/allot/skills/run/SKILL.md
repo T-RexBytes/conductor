@@ -71,10 +71,13 @@ needs, at most 3 scouts.
 Pick the lightest mode that fits. Orchestration has overhead; do not pay it when it does not
 pay back.
 
+Triage needs scores, so read `${CLAUDE_SKILL_DIR}/reference/ROUTING.md` and
+`${CLAUDE_SKILL_DIR}/reference/tiers.json` now and score the work as section 5 describes.
+
 - **Direct dispatch.** The request is one micro-task (or two strictly sequential ones), every
   score is 7 or less, and the Risk axis is 1 or less. Show a one-line plan
   (`T1 → allot:builder (sonnet/medium)`), dispatch without asking for approval, and send the
-  result to the watcher only if the task writes files and scores 5 or more.
+  result to the watcher when the review rules in section 8 call for it.
 - **Full orchestration.** Everything else. Continue with section 4.
 
 `--plan-only` always produces a full plan and stops, whatever the triage says.
@@ -95,9 +98,9 @@ context, the brief, re-reading files).
 
 ## 5. Score and route
 
-Read `${CLAUDE_SKILL_DIR}/reference/ROUTING.md` for the rubric and
-`${CLAUDE_SKILL_DIR}/reference/tiers.json` for the tier table. Do not invent tiers, models or
-effort levels that are not in `tiers.json`.
+Use the rubric in `${CLAUDE_SKILL_DIR}/reference/ROUTING.md` and the tier table in
+`${CLAUDE_SKILL_DIR}/reference/tiers.json` (read them in section 3 if you have not yet). Do not
+invent tiers, models or effort levels that are not in `tiers.json`.
 
 For each micro-task:
 
@@ -151,7 +154,9 @@ with an `ALLOT-VERDICT` block.
 
 **Escalation ladder:** if the verdict is `fail`, re-dispatch the task to the next tier in
 `escalation_order` with the original brief plus the watcher's findings. At most 2 escalations
-per task. After that, or if `architect` fails, stop that task and its dependents and ask the
+per task. The ladder is for tasks that write files. A read-only lookup never moves to a tier
+that can write: if a scout's answer is wrong or incomplete, send one sharper scout question or
+answer it yourself. After that, or if `architect` fails, stop that task and its dependents and ask the
 user how to proceed, showing the findings. `pass` with minor findings is accepted; list the
 findings in the report.
 
@@ -173,7 +178,7 @@ the cost index as an estimate.
 
 | Situation | Action |
 |---|---|
-| A tier's model is unavailable on the user's account | Re-dispatch the same brief to the next tier up. If `opus` is unavailable, the watcher role falls back to `allot:builder-plus`, and the report says "reduced verification". |
+| A tier's model is unavailable on the user's account | Re-dispatch the same brief to the next tier up. If `opus` is unavailable, the watcher role falls back to `allot:builder-plus`, which can write, so keep it to review: its brief sets Owned paths to "None. Review only.", includes the WATCHER_RUBRIC checks, and asks for an `ALLOT-VERDICT` block. Then confirm its report lists no changed files; any change is a stray edit. The report says "reduced verification". |
 | An agent returns `blocked` | Read its `needs`. Answer from facts you have, dispatch a scout, or ask the user. Do not guess. |
 | An agent edits a path it does not own | Treat as `fail`; the watcher reviews the stray edit; tell the user. |
 | A permission prompt is denied | Do not retry the action in another way. Mark the task `blocked` and report it. |

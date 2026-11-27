@@ -65,7 +65,7 @@
       "score_max": 12,
       "writes": true,
       "cost_index": 40,
-      "use_for": "Architecture and design decisions, security-sensitive changes, unknown root causes, work where a wrong call is expensive.",
+      "use_for": "Architecture and design decisions, security-sensitive changes, unknown root causes in high-risk code or after a lower tier failed, work where a wrong call is expensive.",
       "rationale": "Reserved for judgment-heavy work; effort set explicitly because Opus 5.5 defaults to medium."
     }
   ],
