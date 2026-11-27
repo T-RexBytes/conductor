@@ -77,11 +77,12 @@ Triage needs scores, so read `${CLAUDE_SKILL_DIR}/reference/ROUTING.md` and
 `${CLAUDE_SKILL_DIR}/reference/tiers.json` now and score the work as section 5 describes.
 
 - **Direct dispatch.** The request is one micro-task (or two strictly sequential ones), every
-  score is 7 or less, and the Risk axis is 1 or less. Write the one-line plan first as visible text
-  in the same message as the Agent call, or in a message immediately before it, with the task,
-  agent and model/effort (`T1 <task> → tierly:builder (sonnet/medium)`). In a headless or long run,
-  this line is the only sign of what is running until the report arrives. Dispatch
-  without asking for approval, and send the result to the watcher when section 8 calls for it.
+  score is 7 or less, and the Risk axis is 1 or less. Dispatch in three steps, in order.
+  1. Write the visible plan line before the Agent call in the same message, using
+     `T1 <task> → tierly:<agent> (<model>/<effort>)`. In a headless or long run, that line is the
+     only sign of what is running and on which model until the report arrives.
+  2. Make the Agent call only in the message with the plan line, without asking for approval.
+  3. After the result arrives, send it to the watcher when section 8 calls for it.
 - **Full orchestration.** Everything else. Continue with section 4.
 
 `--plan-only` always produces a full plan and stops, whatever the triage says.
