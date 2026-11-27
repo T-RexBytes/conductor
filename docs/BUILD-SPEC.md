@@ -409,6 +409,8 @@ Use `--repeat` to repeat each task and variant from a fresh fixture copy, and
 `--baseline-effort` to set the explicit baseline effort (default `medium`), which the harness
 records in every results row. A routing change is accepted only if mean pass rate does not drop
 and mean cost per run does not rise on the suite.
+Use `--auth subscription` to run with a Claude subscription login and report costs as list-price
+estimates.
 
 ## 12. Release and maintenance
 

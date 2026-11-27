@@ -6,15 +6,17 @@ Runs each task in two variants, with a fresh fixture copy for each run:
 * baseline: plain Claude Code on Opus, no plugin
 * tierly: the same prompt through `/tierly:tierly --yes`, with the plugin loaded
 
-Both runs use `claude --bare -p ... --output-format json`, which reports `total_cost_usd`
+Both variants use `claude -p ... --output-format json`, which reports `total_cost_usd`
 (a client-side estimate). Each task's check script decides pass or fail.
 
-Requires the `claude` CLI and ANTHROPIC_API_KEY (bare mode does not use subscription login).
-Running it costs money. Use --dry-run to print the commands without running anything.
+Requires the `claude` CLI. The default uses `--bare` with ANTHROPIC_API_KEY.
+Use `--auth subscription` to use your Claude login and plan usage limits.
+Use --dry-run to print the commands without running anything.
 
 Usage:
     python benchmarks/run_benchmark.py [--tasks T01,T02] [--variants baseline,tierly]
                                        [--repeat N] [--baseline-effort low|medium|high]
+                                       [--auth api-key|subscription]
                                        [--out results.jsonl] [--dry-run]
 """
 
@@ -37,6 +39,7 @@ REPO_ROOT = BENCH_DIR.parent
 PLUGIN_DIR = REPO_ROOT / "plugins" / "tierly"
 VARIANTS = ("baseline", "tierly")
 DEFAULT_BASELINE_EFFORT = "medium"
+DEFAULT_AUTH = "api-key"
 
 
 @dataclass(frozen=True)
@@ -77,13 +80,15 @@ def load_tasks(selected: set[str] | None = None) -> list[Task]:
 
 def build_command(
     task: Task, variant: str, baseline_effort: str = DEFAULT_BASELINE_EFFORT,
+    auth: str = DEFAULT_AUTH,
 ) -> list[str]:
     """Return the claude CLI argv for one run."""
     if variant not in VARIANTS:
         raise ValueError(f"unknown variant: {variant}")
     prompt = task.prompt if variant == "baseline" else f"/tierly:tierly --yes {task.prompt}"
+    auth_flags = ["--safe-mode", "--strict-mcp-config"] if auth == "subscription" else ["--bare"]
     cmd = [
-        "claude", "--bare", "-p", prompt,
+        "claude", *auth_flags, "-p", prompt,
         "--model", "opus",
         "--output-format", "json",
         "--permission-mode", "acceptEdits",
@@ -129,6 +134,7 @@ def run_check(task: Task, workdir: Path) -> bool:
 
 def run_one(
     task: Task, variant: str, baseline_effort: str = DEFAULT_BASELINE_EFFORT,
+    auth: str = DEFAULT_AUTH,
 ) -> dict[str, Any]:
     fixture = BENCH_DIR / "fixtures" / task.fixture
     with tempfile.TemporaryDirectory(prefix=f"tierly-{task.id}-{variant}-") as tmp:
@@ -137,7 +143,7 @@ def run_one(
         started = time.time()
         try:
             proc = subprocess.run(
-                build_command(task, variant, baseline_effort), cwd=workdir,
+                build_command(task, variant, baseline_effort, auth), cwd=workdir,
                 capture_output=True, text=True, timeout=task.timeout_s,
             )
             result = parse_result(proc.stdout)
@@ -150,8 +156,9 @@ def run_one(
     return {"task": task.id, "kind": task.kind, "variant": variant, **result}
 
 
-def summarize(rows: list[dict[str, Any]]) -> str:
-    lines = ["| Task | Variant | Run | Passed | Cost (USD, est.) | Wall (s) |",
+def summarize(rows: list[dict[str, Any]], auth: str = DEFAULT_AUTH) -> str:
+    lines = [f"Benchmark summary (auth mode {auth})", "",
+             "| Task | Variant | Run | Passed | Cost (USD, est.) | Wall (s) |",
              "|---|---|---|---|---|---|"]
     totals: dict[str, float] = {v: 0.0 for v in VARIANTS}
     passes: dict[str, int] = {v: 0 for v in VARIANTS}
@@ -181,6 +188,9 @@ def summarize(rows: list[dict[str, Any]]) -> str:
             pass_rate = passes[v] / counts[v]
             lines.append(f"| {v} | {counts[v]} | {passes[v]}/{counts[v]} ({pass_rate:.1%}) "
                          f"| {mean_cost} | {totals[v]:.4f} | {missing_costs[v]} |")
+    if auth == "subscription":
+        lines.extend(["", "The CLI's `total_cost_usd` is a list-price estimate for comparison only. "
+                          "Runs count against your plan's usage limits."])
     return "\n".join(lines)
 
 
@@ -191,6 +201,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--repeat", type=int, default=1, help="runs per task and variant (default: 1)")
     parser.add_argument("--baseline-effort", choices=("low", "medium", "high"),
                         default=DEFAULT_BASELINE_EFFORT, help="baseline Opus effort (default: medium)")
+    parser.add_argument("--auth", choices=("api-key", "subscription"), default=DEFAULT_AUTH,
+                        help="Claude authentication mode (default: api-key)")
     parser.add_argument("--out", type=Path, default=None, help="write JSONL results here")
     parser.add_argument("--dry-run", action="store_true", help="print commands only")
     args = parser.parse_args(argv)
@@ -214,19 +226,20 @@ def main(argv: list[str] | None = None) -> int:
             for run in range(1, args.repeat + 1):
                 label = f"{task.id} {variant} run {run}"
                 if args.dry_run:
-                    command = build_command(task, variant, args.baseline_effort)
+                    command = build_command(task, variant, args.baseline_effort, args.auth)
                     print(f"[{label}] {shlex.join(command)}")
                     continue
                 print(f"running {label}...", file=sys.stderr)
-                row = run_one(task, variant, args.baseline_effort)
-                rows.append({**row, "run": run, "baseline_effort": args.baseline_effort})
+                row = run_one(task, variant, args.baseline_effort, args.auth)
+                rows.append({**row, "run": run, "baseline_effort": args.baseline_effort,
+                             "auth": args.auth})
     if args.dry_run:
         return 0
     if args.out:
         with args.out.open("w", encoding="utf-8") as fh:
             for row in rows:
                 fh.write(json.dumps(row) + "\n")
-    print(summarize(rows))
+    print(summarize(rows, args.auth))
     return 0
 
 

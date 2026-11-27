@@ -1,7 +1,7 @@
 # Benchmarks
 
 Measures whether Tierly lowers cost **without** lowering quality. Each task runs in two
-variants, with a fresh fixture copy for each run.
+variants, with a fresh fixture copy for each run. The commands below use the default auth mode.
 
 | Variant | Command |
 |---|---|
@@ -21,13 +21,23 @@ python benchmarks/run_benchmark.py --repeat 3 --baseline-effort high --out resul
 python benchmarks/run_benchmark.py --tasks T01 --variants tierly
 ```
 
+The default `--auth api-key` uses `--bare` and requires `ANTHROPIC_API_KEY`. If you have a Claude
+subscription, sign in to Claude Code and use `--auth subscription`. Both variants then use
+`--safe-mode --strict-mcp-config`, and the Tierly variant loads the plugin for that session.
+Subscription runs count against your plan's usage limits, so start with a small pilot.
+The reported dollar amounts are CLI list-price estimates for comparison only.
+
+```bash
+python benchmarks/run_benchmark.py --auth subscription --tasks T03,T06 --repeat 1
+```
+
 `--repeat N` runs each task and variant N times (default 1, minimum 1). The dry run prints
 each command with its run index. `--baseline-effort` accepts `low`, `medium`, or `high` and
 defaults to `medium`, the documented Opus default. The Tierly skill sets its orchestrator's
-effort. Each JSONL row records the run index and the selected baseline effort for either variant.
+effort. Each JSONL row records the run index, selected baseline effort, and auth mode.
 The summary reports pass rate over all runs and mean cost over runs with a reported cost.
 
-Running the suite costs money. In CI it runs only on manual dispatch (`benchmark.yml`).
+API-key runs incur API charges. In CI the suite runs only on manual dispatch (`benchmark.yml`).
 
 ## Layout
 

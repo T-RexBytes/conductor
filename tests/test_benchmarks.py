@@ -35,19 +35,25 @@ def test_unknown_task_id_rejected() -> None:
         rb.load_tasks({"T99"})
 
 
-def test_build_command_variants() -> None:
+@pytest.mark.parametrize(("auth", "auth_flags"), [
+    ("api-key", ["--bare"]),
+    ("subscription", ["--safe-mode", "--strict-mcp-config"]),
+])
+def test_build_command_variants(auth: str, auth_flags: list[str]) -> None:
     task = rb.load_tasks({"T01"})[0]
-    base = rb.build_command(task, "baseline")
-    tierly = rb.build_command(task, "tierly")
-    assert base[:3] == ["claude", "--bare", "-p"]
-    assert base[3] == task.prompt
+    base = rb.build_command(task, "baseline", auth=auth)
+    tierly = rb.build_command(task, "tierly", auth=auth)
+    assert base[base.index("-p") + 1] == task.prompt
     assert base[base.index("--effort") + 1] == "medium"
     assert "--plugin-dir" not in base
-    assert tierly[3].startswith("/tierly:tierly --yes ")
+    assert tierly[tierly.index("-p") + 1] == f"/tierly:tierly --yes {task.prompt}"
     assert tierly[tierly.index("--plugin-dir") + 1] == str(rb.PLUGIN_DIR)
     assert base[base.index("--allowedTools") + 1] == task.allowed_tools
     assert tierly[tierly.index("--allowedTools") + 1] == f"{task.allowed_tools},Agent"
     for cmd in (base, tierly):
+        assert cmd[:cmd.index("-p")] == ["claude", *auth_flags]
+        for flag in ("--bare", "--safe-mode", "--strict-mcp-config"):
+            assert (flag in cmd) == (flag in auth_flags)
         assert cmd[cmd.index("--output-format") + 1] == "json"
         assert cmd[cmd.index("--model") + 1] == "opus"
     with pytest.raises(ValueError):
@@ -109,11 +115,18 @@ def test_repeat_must_be_positive(repeat: int) -> None:
     assert exc.value.code == 2
 
 
-def test_repeat_writes_one_row_per_run(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    calls: list[tuple[str, str, str]] = []
+@pytest.mark.parametrize(("auth_args", "expected_auth"), [
+    ([], "api-key"),
+    (["--auth", "subscription"], "subscription"),
+])
+def test_repeat_writes_one_row_per_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+    auth_args: list[str], expected_auth: str,
+) -> None:
+    calls: list[tuple[str, str, str, str]] = []
 
-    def fake_run(task: rb.Task, variant: str, baseline_effort: str) -> dict[str, Any]:
-        calls.append((task.id, variant, baseline_effort))
+    def fake_run(task: rb.Task, variant: str, baseline_effort: str, auth: str) -> dict[str, Any]:
+        calls.append((task.id, variant, baseline_effort, auth))
         return {"task": task.id, "variant": variant, "passed": True, "total_cost_usd": 0.5}
 
     monkeypatch.setattr(shutil, "which", lambda _: "claude")
@@ -121,6 +134,7 @@ def test_repeat_writes_one_row_per_run(tmp_path: Path, monkeypatch: pytest.Monke
     results = tmp_path / "results.jsonl"
     assert rb.main([
         "--tasks", "T01,T02", "--repeat", "3", "--baseline-effort", "low", "--out", str(results),
+        *auth_args,
     ]) == 0
 
     rows = [json.loads(line) for line in results.read_text(encoding="utf-8").splitlines()]
@@ -132,7 +146,15 @@ def test_repeat_writes_one_row_per_run(tmp_path: Path, monkeypatch: pytest.Monke
     ]
     assert [(row["task"], row["variant"], row["run"]) for row in rows] == expected
     assert {row["baseline_effort"] for row in rows} == {"low"}
-    assert calls == [(task_id, variant, "low") for task_id, variant, _ in expected]
+    assert {row["auth"] for row in rows} == {expected_auth}
+    assert calls == [(task_id, variant, "low", expected_auth) for task_id, variant, _ in expected]
+    summary = capsys.readouterr().out.splitlines()
+    assert summary[0] == f"Benchmark summary (auth mode {expected_auth})"
+    if expected_auth == "subscription":
+        assert "list-price estimate" in summary[-1]
+        assert "plan's usage limits" in summary[-1]
+    else:
+        assert all("usage limits" not in line for line in summary)
 
 
 @pytest.fixture()
