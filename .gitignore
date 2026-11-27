@@ -5,4 +5,7 @@ __pycache__/
 benchmarks/results/
 *.jsonl
 .DS_Store
-.claude/settings.local.json
+# Local Claude Code settings and locally installed skills (never part of the plugin)
+.claude/
+.agents/
+skills-lock.json
