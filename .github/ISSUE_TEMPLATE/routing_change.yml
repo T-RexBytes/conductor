@@ -1,0 +1,25 @@
+name: Routing change proposal
+description: Propose a change to tiers, models, effort levels, score bands, floors or watcher policy
+labels: [routing]
+body:
+  - type: textarea
+    id: change
+    attributes:
+      label: Proposed change
+      description: Which tier or rule, from what to what.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Benchmark results before and after, examples of misrouted tasks, or a link to updated Anthropic guidance.
+    validations:
+      required: true
+  - type: textarea
+    id: risk
+    attributes:
+      label: Quality risk
+      description: What could get worse, and how the watcher or floors cover it.
+    validations:
+      required: true

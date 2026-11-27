@@ -1,0 +1,10 @@
+{
+  "id": "T01",
+  "title": "Add divide() with error handling and tests",
+  "kind": "mixed",
+  "fixture": "calc",
+  "prompt": "Add a divide(a, b) function to calc.py that returns a / b and raises ValueError with the message 'division by zero' when b is 0. Add tests for both cases to tests/test_calc.py. All tests must pass when running: python -m pytest -q",
+  "allowed_tools": "Read,Edit,Write,Glob,Grep,Bash(python -m pytest *)",
+  "check": "checks/check_t01.py",
+  "timeout_s": 900
+}

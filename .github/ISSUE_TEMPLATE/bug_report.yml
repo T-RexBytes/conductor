@@ -1,0 +1,39 @@
+name: Bug report
+description: Something Allot did wrong, or Allot affected work outside /allot:run
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you ran, what you expected, what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: plan
+    attributes:
+      label: Plan and report output
+      description: Paste the Allot plan and report if there was one. Remove anything private.
+      render: text
+  - type: dropdown
+    id: interference
+    attributes:
+      label: Did Allot affect anything outside an /allot:run invocation?
+      options:
+        - "No"
+        - "Yes (release-blocking)"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Allot version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: cc-version
+    attributes:
+      label: Claude Code version
+    validations:
+      required: true

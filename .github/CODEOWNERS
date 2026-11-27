@@ -1,0 +1,6 @@
+# Default owner for everything
+* @Dronzer2code
+
+# Routing and prompts need maintainer review
+/plugins/ @Dronzer2code
+/docs/BUILD-SPEC.md @Dronzer2code

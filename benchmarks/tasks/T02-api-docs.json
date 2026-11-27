@@ -1,0 +1,10 @@
+{
+  "id": "T02",
+  "title": "Document the public API",
+  "kind": "read-heavy",
+  "fixture": "calc",
+  "prompt": "Create docs/API.md documenting every public function in calc.py: its signature, what it returns, and one usage example each. Do not modify calc.py.",
+  "allowed_tools": "Read,Write,Glob,Grep",
+  "check": "checks/check_t02.py",
+  "timeout_s": 900
+}

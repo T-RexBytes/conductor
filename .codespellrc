@@ -1,0 +1,3 @@
+[codespell]
+skip = .git,*.jsonl,./benchmarks/results
+ignore-words-list = allot
