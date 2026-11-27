@@ -37,7 +37,7 @@ jobs:
           else
             python benchmarks/run_benchmark.py --out benchmark-results.jsonl
           fi
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: benchmark-results
           path: benchmark-results.jsonl
