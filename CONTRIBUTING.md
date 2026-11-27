@@ -13,8 +13,8 @@ bar for changes is evidence, not opinion. Please read this page before opening a
 ## Development setup
 
 ```bash
-git clone https://github.com/Dronzer2code/allot.git
-cd allot
+git clone https://github.com/T-RexBytes/conductor.git
+cd conductor
 python -m pip install -r requirements-dev.txt
 python scripts/validate_repo.py
 python -m pytest -q

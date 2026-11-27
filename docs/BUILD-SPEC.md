@@ -64,7 +64,7 @@ safe to hand down) and discipline on every task. Allot does it for them.
 ### 4.1 Install
 
 ```text
-/plugin marketplace add Dronzer2code/allot
+/plugin marketplace add T-RexBytes/conductor
 /plugin install allot@allot
 ```
 

@@ -81,7 +81,7 @@ Do them in this order. After each one, run `python scripts/validate_repo.py` and
 
 ### Step 2: Put the repo on GitHub (milestone M1)
 
-1. `git init`, commit, push to `Dronzer2code/allot`.
+1. `git init`, commit, push to `T-RexBytes/conductor`.
 2. Confirm all CI jobs pass on GitHub. If `markdownlint-cli2-action@v19` or another action version
    fails to resolve, bump it to the latest major and note it in the commit.
 3. Before publishing widely, check that the name "allot" is not taken on GitHub or in the Claude

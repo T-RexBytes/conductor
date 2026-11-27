@@ -15,4 +15,4 @@ Usage:
 /allot:run [--plan-only] [--yes] [--no-recon] [--profile budget|balanced|quality] [--parallel N] <task>
 ```
 
-Full documentation: <https://github.com/Dronzer2code/allot>
+Full documentation: <https://github.com/T-RexBytes/conductor>

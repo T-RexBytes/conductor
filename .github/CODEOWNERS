@@ -1,6 +1,6 @@
 # Default owner for everything
-* @Dronzer2code
+* @T-RexBytes
 
 # Routing and prompts need maintainer review
-/plugins/ @Dronzer2code
-/docs/BUILD-SPEC.md @Dronzer2code
+/plugins/ @T-RexBytes
+/docs/BUILD-SPEC.md @T-RexBytes
