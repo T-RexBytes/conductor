@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Conductor benchmark harness.
 
-Runs each task twice from a clean copy of its fixture:
+Runs each task in two variants, with a fresh fixture copy for each run:
 
 * baseline: plain Claude Code on Opus, no plugin
 * conductor: the same prompt through `/conductor:conductor --yes`, with the plugin loaded
@@ -14,6 +14,7 @@ Running it costs money. Use --dry-run to print the commands without running anyt
 
 Usage:
     python benchmarks/run_benchmark.py [--tasks T01,T02] [--variants baseline,conductor]
+                                       [--repeat N] [--baseline-effort low|medium|high]
                                        [--out results.jsonl] [--dry-run]
 """
 
@@ -35,6 +36,7 @@ BENCH_DIR = Path(__file__).resolve().parent
 REPO_ROOT = BENCH_DIR.parent
 PLUGIN_DIR = REPO_ROOT / "plugins" / "conductor"
 VARIANTS = ("baseline", "conductor")
+DEFAULT_BASELINE_EFFORT = "medium"
 
 
 @dataclass(frozen=True)
@@ -73,7 +75,9 @@ def load_tasks(selected: set[str] | None = None) -> list[Task]:
     return tasks
 
 
-def build_command(task: Task, variant: str) -> list[str]:
+def build_command(
+    task: Task, variant: str, baseline_effort: str = DEFAULT_BASELINE_EFFORT,
+) -> list[str]:
     """Return the claude CLI argv for one run."""
     if variant not in VARIANTS:
         raise ValueError(f"unknown variant: {variant}")
@@ -85,7 +89,9 @@ def build_command(task: Task, variant: str) -> list[str]:
         "--permission-mode", "acceptEdits",
         "--allowedTools", task.allowed_tools,
     ]
-    if variant == "conductor":
+    if variant == "baseline":
+        cmd += ["--effort", baseline_effort]
+    else:
         # The orchestrator dispatches subagents through the Agent tool.
         cmd[cmd.index("--allowedTools") + 1] = f"{task.allowed_tools},Agent"
         cmd += ["--plugin-dir", str(PLUGIN_DIR)]
@@ -121,7 +127,9 @@ def run_check(task: Task, workdir: Path) -> bool:
     return result.returncode == 0
 
 
-def run_one(task: Task, variant: str) -> dict[str, Any]:
+def run_one(
+    task: Task, variant: str, baseline_effort: str = DEFAULT_BASELINE_EFFORT,
+) -> dict[str, Any]:
     fixture = BENCH_DIR / "fixtures" / task.fixture
     with tempfile.TemporaryDirectory(prefix=f"conductor-{task.id}-{variant}-") as tmp:
         workdir = Path(tmp) / task.fixture
@@ -129,7 +137,7 @@ def run_one(task: Task, variant: str) -> dict[str, Any]:
         started = time.time()
         try:
             proc = subprocess.run(
-                build_command(task, variant), cwd=workdir,
+                build_command(task, variant, baseline_effort), cwd=workdir,
                 capture_output=True, text=True, timeout=task.timeout_s,
             )
             result = parse_result(proc.stdout)
@@ -143,27 +151,36 @@ def run_one(task: Task, variant: str) -> dict[str, Any]:
 
 
 def summarize(rows: list[dict[str, Any]]) -> str:
-    lines = ["| Task | Variant | Passed | Cost (USD, est.) | Wall (s) |",
-             "|---|---|---|---|---|"]
+    lines = ["| Task | Variant | Run | Passed | Cost (USD, est.) | Wall (s) |",
+             "|---|---|---|---|---|---|"]
     totals: dict[str, float] = {v: 0.0 for v in VARIANTS}
     passes: dict[str, int] = {v: 0 for v in VARIANTS}
     counts: dict[str, int] = {v: 0 for v in VARIANTS}
+    missing_costs: dict[str, int] = {v: 0 for v in VARIANTS}
     for row in rows:
         cost = row.get("total_cost_usd")
         cost_s = f"{cost:.4f}" if isinstance(cost, (int, float)) else "n/a"
-        lines.append(f"| {row['task']} | {row['variant']} | {'yes' if row['passed'] else 'no'} "
+        lines.append(f"| {row['task']} | {row['variant']} | {row.get('run', 1)} "
+                     f"| {'yes' if row['passed'] else 'no'} "
                      f"| {cost_s} | {row.get('wall_s', 'n/a')} |")
         v = row["variant"]
         counts[v] += 1
         passes[v] += int(bool(row["passed"]))
         if isinstance(cost, (int, float)):
             totals[v] += cost
+        else:
+            missing_costs[v] += 1
     lines.append("")
-    lines.append("| Variant | Pass rate | Total cost (USD, est.) |")
-    lines.append("|---|---|---|")
+    lines.append("| Variant | Runs | Pass rate | Mean cost per run (USD, est.) "
+                 "| Total cost (USD, est.) | Runs without cost |")
+    lines.append("|---|---|---|---|---|---|")
     for v in VARIANTS:
         if counts[v]:
-            lines.append(f"| {v} | {passes[v]}/{counts[v]} | {totals[v]:.4f} |")
+            with_cost = counts[v] - missing_costs[v]
+            mean_cost = f"{totals[v] / with_cost:.4f}" if with_cost else "n/a"
+            pass_rate = passes[v] / counts[v]
+            lines.append(f"| {v} | {counts[v]} | {passes[v]}/{counts[v]} ({pass_rate:.1%}) "
+                         f"| {mean_cost} | {totals[v]:.4f} | {missing_costs[v]} |")
     return "\n".join(lines)
 
 
@@ -171,9 +188,14 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run the Conductor benchmark suite.")
     parser.add_argument("--tasks", default="", help="comma-separated task ids (default: all)")
     parser.add_argument("--variants", default=",".join(VARIANTS))
+    parser.add_argument("--repeat", type=int, default=1, help="runs per task and variant (default: 1)")
+    parser.add_argument("--baseline-effort", choices=("low", "medium", "high"),
+                        default=DEFAULT_BASELINE_EFFORT, help="baseline Opus effort (default: medium)")
     parser.add_argument("--out", type=Path, default=None, help="write JSONL results here")
     parser.add_argument("--dry-run", action="store_true", help="print commands only")
     args = parser.parse_args(argv)
+    if args.repeat < 1:
+        parser.error("--repeat must be at least 1")
 
     selected = {t.strip() for t in args.tasks.split(",") if t.strip()} or None
     variants = [v.strip() for v in args.variants.split(",") if v.strip()]
@@ -182,21 +204,24 @@ def main(argv: list[str] | None = None) -> int:
             parser.error(f"unknown variant: {v}")
     tasks = load_tasks(selected)
 
-    if args.dry_run:
-        for task in tasks:
-            for variant in variants:
-                print(f"[{task.id} {variant}] " + shlex.join(build_command(task, variant)))
-        return 0
-
-    if shutil.which("claude") is None:
+    if not args.dry_run and shutil.which("claude") is None:
         print("error: the claude CLI is not on PATH", file=sys.stderr)
         return 2
 
     rows = []
     for task in tasks:
         for variant in variants:
-            print(f"running {task.id} ({variant})...", file=sys.stderr)
-            rows.append(run_one(task, variant))
+            for run in range(1, args.repeat + 1):
+                label = f"{task.id} {variant} run {run}"
+                if args.dry_run:
+                    command = build_command(task, variant, args.baseline_effort)
+                    print(f"[{label}] {shlex.join(command)}")
+                    continue
+                print(f"running {label}...", file=sys.stderr)
+                row = run_one(task, variant, args.baseline_effort)
+                rows.append({**row, "run": run, "baseline_effort": args.baseline_effort})
+    if args.dry_run:
+        return 0
     if args.out:
         with args.out.open("w", encoding="utf-8") as fh:
             for row in rows:

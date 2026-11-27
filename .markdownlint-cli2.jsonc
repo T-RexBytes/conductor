@@ -7,5 +7,5 @@
     "MD041": false,
     "MD060": false
   },
-  "ignores": ["**/node_modules/**", "benchmarks/fixtures/**"]
+  "ignores": ["**/node_modules/**", "benchmarks/fixtures/**", "!benchmarks/reference/**"]
 }

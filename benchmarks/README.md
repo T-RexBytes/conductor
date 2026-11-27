@@ -1,11 +1,11 @@
 # Benchmarks
 
-Measures whether Conductor lowers cost **without** lowering quality. Every task runs twice from a
-clean copy of its fixture:
+Measures whether Conductor lowers cost **without** lowering quality. Each task runs in two
+variants, with a fresh fixture copy for each run.
 
 | Variant | Command |
 |---|---|
-| baseline | `claude --bare -p "<prompt>" --model opus --output-format json ...` |
+| baseline | `claude --bare -p "<prompt>" --model opus --effort medium --output-format json ...` |
 | conductor | `claude --bare -p "/conductor --yes <prompt>" --model opus --plugin-dir ./plugins/conductor ...` |
 
 The harness records `total_cost_usd` from the JSON output (a client-side estimate) and runs the
@@ -17,8 +17,15 @@ task's check script for pass or fail.
 python benchmarks/run_benchmark.py --dry-run          # print the commands, run nothing
 export ANTHROPIC_API_KEY=...                           # bare mode needs an API key
 python benchmarks/run_benchmark.py --out results.jsonl
+python benchmarks/run_benchmark.py --repeat 3 --baseline-effort high --out results.jsonl
 python benchmarks/run_benchmark.py --tasks T01 --variants conductor
 ```
+
+`--repeat N` runs each task and variant N times (default 1, minimum 1). The dry run prints
+each command with its run index. `--baseline-effort` accepts `low`, `medium`, or `high` and
+defaults to `medium`, the documented Opus default. The Conductor skill sets its orchestrator's
+effort. Each JSONL row records the run index and the selected baseline effort for either variant.
+The summary reports pass rate over all runs and mean cost over runs with a reported cost.
 
 Running the suite costs money. In CI it runs only on manual dispatch (`benchmark.yml`).
 
@@ -29,6 +36,8 @@ Running the suite costs money. In CI it runs only on manual dispatch (`benchmark
 | `tasks/*.json` | One task per file: id, title, kind, fixture, prompt, allowed tools, check script, timeout |
 | `fixtures/<name>/` | Starting project for tasks; copied fresh for every run |
 | `checks/*.py` | Pass/fail scripts, called as `python check.py <workdir> <fixture_dir>` |
+| `checks/hidden/<id>/` | Hidden tests that check scripts may copy into the workdir after the agent finishes. The agent under test never sees them. |
+| `reference/<id>/` | Reference solution files copied over a fresh fixture, replacing files at matching paths |
 | `run_benchmark.py` | The harness |
 
 ## Adding a task
@@ -37,11 +46,10 @@ Running the suite costs money. In CI it runs only on manual dispatch (`benchmark
 2. Write `checks/check_<id>.py`. It must print `PASS` or `FAIL: <reason>` and exit 0 only on pass.
    Check behavior, not wording.
 3. Add `tasks/<id>-<slug>.json`. List only the tools the task needs in `allowed_tools`.
-4. Add a test in `tests/test_benchmarks.py` proving the check fails on the untouched fixture and
-   passes on a reference solution.
+4. Add `reference/<id>/` with a reference solution. The generic tests check it.
 
 Aim for a mix of `kind` values: `read-heavy`, `mixed`, `judgment-heavy`, `tiny`.
 
 ## Acceptance rule for routing changes
 
-Pass rate must not drop, and total cost must not rise, compared with `main`.
+Mean pass rate must not drop, and mean cost per run must not rise, compared with `main`.

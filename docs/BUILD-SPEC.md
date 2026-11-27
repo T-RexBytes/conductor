@@ -397,12 +397,14 @@ E7 and E8 stay manual.
 
 ### 11.3 Benchmarks (`benchmarks/`)
 
-Each task runs twice from a clean copy of its fixture: **baseline** (`claude --bare -p` with
+Each task runs in two variants from clean copies of its fixture: **baseline** (`claude --bare -p` with
 `--model opus`, no plugin) and **conductor** (`--plugin-dir ./plugins/conductor`, prompt
 `/conductor --yes <task>`). Both use `--output-format json`; the harness records
 `total_cost_usd` and the per-model breakdown, then runs the task's check script for pass or fail.
-A routing change is accepted only if quality (pass rate) does not drop and cost does not rise on
-the suite.
+Use `--repeat` to repeat each task and variant from a fresh fixture copy, and
+`--baseline-effort` to set the explicit baseline effort (default `medium`), which the harness
+records in every results row. A routing change is accepted only if mean pass rate does not drop
+and mean cost per run does not rise on the suite.
 
 ## 12. Release and maintenance
 
