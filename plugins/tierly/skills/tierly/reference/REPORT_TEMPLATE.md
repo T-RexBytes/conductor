@@ -17,7 +17,11 @@ Open findings and follow-ups:
 - <minor findings, blocked tasks, questions for the user>
 
 Routing mix: scout <n>, worker <n>, builder <n>, builder-plus <n>, architect <n>, watcher calls <n>
-Relative cost index: <run total> vs <all-Opus equivalent>. Estimate from list-price ratios;
-check your Claude usage view for actual spend.
+Relative cost index (dispatched work only, estimate): <dispatched total> vs <all-Opus equivalent>.
+Excludes the orchestrator's own planning, routing and review on Opus in the main session.
+Check your Claude usage view for actual spend.
 <"Reduced verification" line, only if the watcher fell back to builder-plus.>
 ```
+
+For small direct-dispatch tasks, replace the cost comparison and its explanation with
+`Orchestration overhead may exceed the saving on tasks this small.`

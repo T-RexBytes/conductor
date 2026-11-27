@@ -56,8 +56,10 @@ If a flag value is invalid, say which one and use its default.
 
 Restate the goal in one or two sentences and list what "done" means to the user. Identify:
 the deliverables, the files or systems involved, constraints the user stated, and anything
-that is ambiguous. If an ambiguity would change the result, ask the user now (one concise
-question, using AskUserQuestion when available) before planning.
+that is ambiguous. If an ambiguity would change the result, ask only the single concise question
+that unblocks planning, using AskUserQuestion when available. A second question delays the answer
+that matters. Settle secondary details, such as whether to run tests, in the plan, which already
+shows every proposed action for the user to approve or edit.
 
 **Reconnaissance** (skipped with `--no-recon`, or when the request does not concern the
 project's files): to plan accurately you may need facts about the codebase. Get them cheaply by
@@ -75,9 +77,10 @@ Triage needs scores, so read `${CLAUDE_SKILL_DIR}/reference/ROUTING.md` and
 `${CLAUDE_SKILL_DIR}/reference/tiers.json` now and score the work as section 5 describes.
 
 - **Direct dispatch.** The request is one micro-task (or two strictly sequential ones), every
-  score is 7 or less, and the Risk axis is 1 or less. Show a one-line plan
-  (`T1 → tierly:builder (sonnet/medium)`), dispatch without asking for approval, and send the
-  result to the watcher when the review rules in section 8 call for it.
+  score is 7 or less, and the Risk axis is 1 or less. Before dispatching, print a one-line plan
+  with the task, agent and model/effort (`T1 <task> → tierly:builder (sonnet/medium)`). Even
+  without approval, the user should see what is about to run and on which model. Dispatch
+  without asking for approval, and send the result to the watcher when section 8 calls for it.
 - **Full orchestration.** Everything else. Continue with section 4.
 
 `--plan-only` always produces a full plan and stops, whatever the triage says.
@@ -117,7 +120,9 @@ For each micro-task:
 
 Use `${CLAUDE_SKILL_DIR}/reference/PLAN_TEMPLATE.md`. The plan shows every task with its
 scores, tier, model and effort, dependencies, owned paths, any shell, web or MCP actions the
-task needs (with the reason), whether the watcher reviews it, and the run's relative cost index.
+task needs (with the reason), whether the watcher reviews it, and the relative cost index for
+dispatched work only. The index excludes the orchestrator's own planning, routing and review,
+which run on Opus in the main session.
 
 - `--plan-only`: show the plan and stop.
 - `--yes`: show the plan and continue.
@@ -172,8 +177,10 @@ asked for tests or a build to pass, the final check runs them (it was listed in 
 
 Use `${CLAUDE_SKILL_DIR}/reference/REPORT_TEMPLATE.md`. Keep it short: the outcome, a task table
 (agent, model and effort, status, verdict, escalations), files changed, open findings and
-follow-ups, the routing mix, and the relative cost index next to the all-Opus equivalent. Label
-the cost index as an estimate.
+follow-ups, and the routing mix. Compare the estimated relative cost index for dispatched work
+only with its all-Opus equivalent. The index excludes the orchestrator's own planning, routing
+and review, which run on Opus in the main session. For small direct-dispatch tasks, replace the
+comparison with a note that orchestration overhead may exceed the saving on tasks this small.
 
 ## Failure handling
 

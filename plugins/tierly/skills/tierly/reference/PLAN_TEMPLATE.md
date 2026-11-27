@@ -14,8 +14,10 @@ Done means: <the user's definition of done, one line>
 
 Extra actions: shell, web, or MCP actions a task needs, each with the reason. "-" means none.
 
-Relative cost index: <sum of task indexes + watcher indexes> (all-Opus equivalent: <N x 40 + watcher>)
-This is an estimate from list-price ratios, not a bill.
+Relative cost index (dispatched work only, estimate): <sum of task indexes + watcher indexes>
+All-Opus equivalent: <N x 40 + watcher>
+The estimate uses list-price ratios and excludes the orchestrator's own planning, routing and
+review, which run on Opus in the main session.
 
 Questions before starting: <none | the question>
 ```
