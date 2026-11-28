@@ -15,6 +15,7 @@ Files changed:
 
 Open findings and follow-ups:
 - <minor findings, blocked tasks, questions for the user>
+- <path:line: embedded instruction aimed at an agent and what it asked for>
 
 Routing mix: scout <n>, worker <n>, builder <n>, builder-plus <n>, architect <n>, watcher calls <n>
 Relative cost index (dispatched work only, estimate): <dispatched total> vs <all-Opus equivalent>.
