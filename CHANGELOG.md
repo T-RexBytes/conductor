@@ -8,8 +8,6 @@ All notable changes to this project are documented here. The format follows
 
 ## [0.1.0] - unreleased
 
-Renamed from the working names Allot and Conductor to Tierly; the command is `/tierly`.
-
 ### Added
 
 - `/tierly` orchestrator skill with triage gate, four-axis scoring, hard floors, profiles,

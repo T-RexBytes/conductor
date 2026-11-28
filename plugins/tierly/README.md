@@ -15,4 +15,4 @@ Usage:
 /tierly [--plan-only] [--yes] [--no-recon] [--profile budget|balanced|quality] [--parallel N] <task>
 ```
 
-Full documentation: <https://github.com/T-RexBytes/conductor>
+Full documentation: <https://github.com/T-RexBytes/tierly>

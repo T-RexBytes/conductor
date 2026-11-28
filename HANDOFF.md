@@ -82,11 +82,10 @@ Do them in this order. After each one, run `python scripts/validate_repo.py` and
 
 ### Step 2: Put the repo on GitHub (milestone M1)
 
-1. `git init`, commit, push to `T-RexBytes/conductor`.
+1. `git init`, commit, push to `T-RexBytes/tierly`.
 2. Confirm all CI jobs pass on GitHub. If `markdownlint-cli2-action@v19` or another action version
    fails to resolve, bump it to the latest major and note it in the commit.
-3. The 2026-11-27 name check found that "conductor" collided, so the plugin was renamed Tierly and
-   needs no further name check because it is not published to any directory.
+3. The name check is done. The name is Tierly. The plugin is not published to any directory.
 
 ### Step 3: Live verification (milestones M2–M5)
 
@@ -121,9 +120,8 @@ If any eval fails, fix SKILL.md, the agent or the reference file, then re-run th
 
 ## 4. Decisions already made (do not reopen without an issue)
 
-- **Name:** Tierly (chosen by the maintainer on 2026-11-27 after "Conductor" collided with
-  several existing Claude Code plugins and products). Earlier working names: "Allot" and
-  "Conductor". "Tierward" and "Cadre" were rejected because they are taken.
+- **Name:** Tierly (final).
+  "Tierward" and "Cadre" were rejected because they are taken.
 - **Distribution:** GitHub only, from this repo's own marketplace. Not submitted to the official
   plugin directory or any other listing.
 - **Claude-first.** Other providers (Codex, Gemini) are v0.3 "Bridges", opt-in only.

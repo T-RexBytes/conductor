@@ -2,7 +2,7 @@
   "name": "tierly",
   "description": "Tierly: cost-aware, plan-first subagent orchestration for Claude Code.",
   "owner": {
-    "name": "Subarna Maity"
+    "name": "Sourish Panda"
   },
   "plugins": [
     {

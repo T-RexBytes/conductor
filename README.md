@@ -8,7 +8,7 @@ checks the work with an independent reviewer, and tells you what ran where.
 /tierly add pagination to the orders API, with tests that pass
 ```
 
-[![CI](https://github.com/T-RexBytes/conductor/actions/workflows/ci.yml/badge.svg)](https://github.com/T-RexBytes/conductor/actions/workflows/ci.yml)
+[![CI](https://github.com/T-RexBytes/tierly/actions/workflows/ci.yml/badge.svg)](https://github.com/T-RexBytes/tierly/actions/workflows/ci.yml)
 ![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
@@ -24,7 +24,7 @@ and Sonnet, keeps judgment on Opus, and has an Opus watcher check anything that 
 In Claude Code:
 
 ```text
-/plugin marketplace add T-RexBytes/conductor
+/plugin marketplace add T-RexBytes/tierly
 /plugin install tierly@tierly
 ```
 

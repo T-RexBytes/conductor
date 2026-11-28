@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Status | Draft for v0.1.0 (MVP) |
-| Owner | Subarna Maity |
+| Owner | Sourish Panda |
 | Last updated | 2026-11-27 |
 | Applies to | Claude Code plugins (skills + subagents) |
 
@@ -66,7 +66,7 @@ safe to hand down) and discipline on every task. Tierly does it for them.
 Install Tierly from this GitHub repo's own marketplace.
 
 ```text
-/plugin marketplace add T-RexBytes/conductor
+/plugin marketplace add T-RexBytes/tierly
 /plugin install tierly@tierly
 ```
 
