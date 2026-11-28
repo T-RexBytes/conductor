@@ -17,7 +17,7 @@ checks the work with an independent reviewer, and tells you what ran where.
 One Claude Code session usually runs every step on one model. Searching for a symbol then costs
 as much per token as designing a migration. Per-token prices across Claude models differ by up
 to 40x, so routine steps are where most of the waste is. Tierly moves routine steps down to Haiku
-and Sonnet, keeps judgment on Opus, and has an Opus watcher check anything that matters.
+and Sonnet, keeps judgment on Opus, and has a Sonnet watcher check anything that matters.
 
 ## Install
 
@@ -53,7 +53,7 @@ What happens:
    ambiguity, risk and breadth, and routed to a tier. You see the plan and approve, edit, or
    cancel it.
 4. **Run.** Independent tasks run in parallel. Each subagent gets a self-contained brief.
-5. **Check.** A read-only Opus watcher reviews every non-trivial change. Failed work is redone one
+5. **Check.** A read-only Sonnet watcher reviews every non-trivial change. Failed work is redone one
    tier up, at most twice, and then Tierly asks you.
 6. **Report.** Outcome, files changed, what ran on which model, and a relative cost estimate.
 
@@ -66,7 +66,7 @@ What happens:
 | builder | Sonnet / medium | Well-specified features, bug fixes with a known cause |
 | builder-plus | Sonnet / high | Harder, cross-module or debugging work |
 | architect | Opus / high | Design decisions, security-sensitive and judgment-heavy work |
-| watcher | Opus / high | Independent read-only review |
+| watcher | Sonnet / high | Independent read-only review |
 
 Hard rules override the score: anything security-, payment- or data-destructive goes to
 architect (design) or builder-plus (implementation) with mandatory review, and large-context work
@@ -105,7 +105,7 @@ counts toward the same limits as your main conversation. See
 - Claude Code only. Tierly dispatches Claude Code subagents (`tierly:*`) with set models and effort
   levels. It does not run on claude.ai, the Skills API or other agent harnesses.
 - A Claude plan or API access with Haiku, Sonnet and Opus.
-- If Opus is unavailable, review falls back to Sonnet at high effort and the report says so.
+- If a tier's model is unavailable, Tierly re-dispatches to the next tier up. If Sonnet is unavailable for the watcher, the watcher role falls back to architect in a review-only brief, and the report says "reduced verification".
 - The skill loads only when you type `/tierly`. Between runs, only six short agent descriptions sit
   in context. Tierly adds no hooks, MCP servers or settings changes.
 

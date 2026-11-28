@@ -141,7 +141,7 @@ Tierly uses none of the ignored keys.
 | builder | sonnet | medium | 40 | Agent | false | Well-specified features, known-cause fixes |
 | builder-plus | sonnet | high | 60 | Agent | false | Harder, cross-module, debugging |
 | architect | opus | high | 60 | Agent | false | Design, security-sensitive, judgment-heavy |
-| watcher | opus | high | 25 | Write, Edit, NotebookEdit, Agent | false | Independent read-only review |
+| watcher | sonnet | high | 25 | Write, Edit, NotebookEdit, Agent | false | Independent read-only review |
 
 Design decisions:
 
@@ -166,7 +166,7 @@ Design decisions:
 | builder | tierly:builder | sonnet | medium | 5–7 | yes | 20 |
 | builder-plus | tierly:builder-plus | sonnet | high | 8–9 | yes | 20 |
 | architect | tierly:architect | opus | high | 10–12 | yes | 40 |
-| (watcher) | tierly:watcher | opus | high | n/a | no | 40 |
+| (watcher) | tierly:watcher | sonnet | high | n/a | no | 20 |
 
 Effort choices follow Anthropic's per-model guidance as of the snapshot date:
 

@@ -26,7 +26,7 @@ Fable-tier models cost well above Opus and are not used by Tierly.
 
 | Model | Default effort | Guidance used by Tierly |
 |---|---|---|
-| Opus 5.5 | medium | Set explicitly; Tierly uses `high` for architect and watcher |
+| Opus 5.5 | medium | Set explicitly; Tierly uses `high` for architect |
 | Sonnet 5.5 | high (API) | `medium` for well-specified agentic coding, `high` for harder or longer tasks |
 | Haiku 5.5 | medium | `medium` for most work including agentic coding; `low` for short tool tasks only |
 

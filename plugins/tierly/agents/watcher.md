@@ -1,7 +1,7 @@
 ---
 name: watcher
 description: Internal to the tierly plugin. Do not select this agent unless dispatched by /tierly with a TIERLY TASK brief. Independent read-only review of subagent work.
-model: opus
+model: sonnet
 effort: high
 maxTurns: 25
 disallowedTools: Write, Edit, NotebookEdit, Agent

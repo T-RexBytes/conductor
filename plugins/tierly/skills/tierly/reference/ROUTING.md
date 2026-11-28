@@ -76,6 +76,9 @@ The watcher reviews a task when any of these is true:
 
 The orchestrator checks read-only scout output itself.
 
+The watcher runs on Sonnet at high effort with cost index 20. The architect remains the Opus
+tier for design and other judgment-heavy work.
+
 ## Worked examples
 
 | Micro-task | C | A | R | B | Raw | Tier (balanced) | Notes |

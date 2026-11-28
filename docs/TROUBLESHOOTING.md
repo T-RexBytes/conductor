@@ -21,8 +21,8 @@ if you want routing.
 
 ## The report says "reduced verification"
 
-Your account could not run the Opus watcher, so reviews ran on Sonnet at high effort. Results are
-still reviewed, but less strictly.
+Your account could not run Sonnet for the watcher, so the watcher role fell back to architect in a
+review-only brief. Results are still reviewed, but the report says "reduced verification".
 
 ## Approval asked in plain text instead of a question card
 

@@ -40,10 +40,10 @@ cache-write price is assumed to be 1.25x its input price.
 | Orchestrator | Opus | 30k | 40k | 400k | 15k | $0.70 |
 | 4 scouts | Haiku | 200k | 100k | 1,000k | 20k | $0.05 |
 | Builders | Sonnet | 100k | 150k | 1,500k | 50k | $1.23 |
-| Watcher | Opus | 60k | 0 | 100k | 10k | $0.46 |
-| **Total** | | | | | 3,775k tokens | **$2.44** |
+| Watcher | Sonnet | 60k | 0 | 100k | 10k | $0.23 |
+| **Total** | | | | | 3,775k tokens | **$2.21** |
 
-Result: about **36% lower cost** with about **10% more tokens**. All token counts are assumptions
+Result: about **42% lower cost** with about **10% more tokens**. All token counts are assumptions
 chosen to be plausible; real runs vary widely.
 
 ## Expected ranges by task type

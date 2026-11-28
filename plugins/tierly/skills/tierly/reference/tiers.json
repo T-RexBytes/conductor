@@ -71,9 +71,9 @@
   ],
   "watcher": {
     "agent": "tierly:watcher",
-    "model": "opus",
+    "model": "sonnet",
     "effort": "high",
-    "cost_index": 40
+    "cost_index": 20
   },
   "orchestrator": {
     "model": "opus",

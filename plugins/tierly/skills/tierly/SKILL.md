@@ -197,7 +197,7 @@ comparison with a note that orchestration overhead may exceed the saving on task
 
 | Situation | Action |
 |---|---|
-| A tier's model is unavailable on the user's account | Re-dispatch the same brief to the next tier up. If `opus` is unavailable, the watcher role falls back to `tierly:builder-plus`, which can write, so keep it to review: its brief sets Owned paths to "None. Review only.", includes the WATCHER_RUBRIC checks, and asks for a `TIERLY-VERDICT` block. Then confirm its report lists no changed files; any change is a stray edit. The report says "reduced verification". |
+| A tier's model is unavailable on the user's account | Re-dispatch the same brief to the next tier up. If Sonnet is unavailable for the watcher, the watcher role falls back to `tierly:architect` in a review-only brief. Its brief sets Owned paths to "None. Review only.", includes the WATCHER_RUBRIC checks, and asks for a `TIERLY-VERDICT` block. Then confirm its report lists no changed files; any change is a stray edit. The report says "reduced verification". |
 | An agent returns `blocked` | Read its `needs`. Answer from facts you have, dispatch a scout, or ask the user. Do not guess. |
 | An agent edits a path it does not own | Treat as `fail`; the watcher reviews the stray edit; tell the user. |
 | A permission prompt is denied | Do not retry the action in another way. When a needed step is denied, mark the task `blocked`, even if other steps finished. List what was done and the exact denied action the user can run or allow, because `partial` hides that a required check never ran. |
