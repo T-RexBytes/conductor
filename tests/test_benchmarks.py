@@ -37,7 +37,7 @@ def test_unknown_task_id_rejected() -> None:
 
 @pytest.mark.parametrize(("auth", "auth_flags"), [
     ("api-key", ["--bare"]),
-    ("subscription", ["--safe-mode", "--strict-mcp-config"]),
+    ("subscription", ["--setting-sources", "project,local", "--strict-mcp-config"]),
 ])
 def test_build_command_variants(auth: str, auth_flags: list[str]) -> None:
     task = rb.load_tasks({"T01"})[0]
@@ -52,23 +52,30 @@ def test_build_command_variants(auth: str, auth_flags: list[str]) -> None:
     assert tierly[tierly.index("--allowedTools") + 1] == f"{task.allowed_tools},Agent"
     for cmd in (base, tierly):
         assert cmd[:cmd.index("-p")] == ["claude", *auth_flags]
-        for flag in ("--bare", "--safe-mode", "--strict-mcp-config"):
+        for flag in ("--bare", "--setting-sources", "--strict-mcp-config"):
             assert (flag in cmd) == (flag in auth_flags)
-        assert cmd[cmd.index("--output-format") + 1] == "json"
+        assert cmd[cmd.index("--output-format") + 1] == "stream-json"
+        assert "--verbose" in cmd
         assert cmd[cmd.index("--model") + 1] == "opus"
     with pytest.raises(ValueError):
         rb.build_command(task, "other")
 
 
 def test_parse_result_fields() -> None:
-    out = json.dumps({"total_cost_usd": 0.42, "is_error": False, "num_turns": 7,
-                      "duration_ms": 1234, "result": "done",
-                      "modelUsage": {"claude-haiku-5-5": {}}})
+    out = "\n".join([
+        json.dumps({"type": "system", "subtype": "init",
+                    "slash_commands": ["tierly:tierly"], "agents": ["tierly:scout"]}),
+        json.dumps({"type": "result", "total_cost_usd": 0.42, "is_error": False,
+                    "num_turns": 7, "duration_ms": 1234, "result": "done",
+                    "modelUsage": {"claude-opus-5-5": {}, "claude-haiku-5-5": {}}}),
+    ])
     parsed = rb.parse_result(out)
     assert parsed["total_cost_usd"] == 0.42
     assert parsed["is_error"] is False
     assert parsed["num_turns"] == 7
-    assert parsed["per_model"] == {"claude-haiku-5-5": {}}
+    assert parsed["per_model"] == {"claude-opus-5-5": {}, "claude-haiku-5-5": {}}
+    assert parsed["models_used"] == ["claude-haiku-5-5", "claude-opus-5-5"]
+    assert parsed["plugin_loaded"] is True
     assert parsed["result"] == "done"
 
 
@@ -77,6 +84,28 @@ def test_parse_result_bad_output(bad: str) -> None:
     parsed = rb.parse_result(bad)
     assert parsed["parse_error"] is True
     assert parsed["is_error"] is True
+
+
+def test_parse_result_missing_init_and_garbage_lines() -> None:
+    parsed = rb.parse_result("garbage\n" + json.dumps({
+        "type": "result", "result": "done", "modelUsage": {"model-b": {}}
+    }) + "\nnot json")
+    assert parsed["parse_error"] is False
+    assert parsed["plugin_loaded"] is False
+    assert parsed["models_used"] == ["model-b"]
+
+
+def test_tierly_without_plugin_is_failed_and_invalid(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    task = rb.load_tasks({"T01"})[0]
+    monkeypatch.setattr(rb, "run_check", lambda task, workdir: True)
+    monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: subprocess.CompletedProcess(
+        args, 0, json.dumps({"type": "result", "result": "done"}), ""))
+    row = rb.run_one(task, "tierly")
+    assert row["passed"] is False
+    assert row["invalid"] == "plugin not loaded"
+    assert row["plugin_loaded"] is False
 
 
 def test_summarize_table() -> None:

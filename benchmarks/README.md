@@ -5,11 +5,11 @@ variants, with a fresh fixture copy for each run. The commands below use the def
 
 | Variant | Command |
 |---|---|
-| baseline | `claude --bare -p "<prompt>" --model opus --effort medium --output-format json ...` |
-| tierly | `claude --bare -p "/tierly:tierly --yes <prompt>" --model opus --plugin-dir ./plugins/tierly ...` |
+| baseline | `claude --bare -p "<prompt>" --model opus --effort medium --output-format stream-json --verbose ...` |
+| tierly | `claude --bare -p "/tierly:tierly --yes <prompt>" --model opus --plugin-dir ./plugins/tierly --output-format stream-json --verbose ...` |
 
-The harness records `total_cost_usd` from the JSON output (a client-side estimate) and runs the
-task's check script for pass or fail.
+The harness records `total_cost_usd` and per-model usage from the JSON stream (client-side
+estimates) and runs the task's check script for pass or fail.
 
 ## Run
 
@@ -23,7 +23,10 @@ python benchmarks/run_benchmark.py --tasks T01 --variants tierly
 
 The default `--auth api-key` uses `--bare` and requires `ANTHROPIC_API_KEY`. If you have a Claude
 subscription, sign in to Claude Code and use `--auth subscription`. Both variants then use
-`--safe-mode --strict-mcp-config`, and the Tierly variant loads the plugin for that session.
+`--setting-sources project,local --strict-mcp-config`, and the Tierly variant loads the plugin for
+that session. The harness verifies the plugin's `tierly:tierly` command appears in the session init
+event; a Tierly run without it is marked invalid and failed. `CLAUDE.md` in your home directory
+still loads in subscription mode, for both variants equally.
 Subscription runs count against your plan's usage limits, so start with a small pilot.
 The reported dollar amounts are CLI list-price estimates for comparison only.
 

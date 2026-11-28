@@ -6,7 +6,7 @@ Runs each task in two variants, with a fresh fixture copy for each run:
 * baseline: plain Claude Code on Opus, no plugin
 * tierly: the same prompt through `/tierly:tierly --yes`, with the plugin loaded
 
-Both variants use `claude -p ... --output-format json`, which reports `total_cost_usd`
+Both variants use `claude -p ... --output-format stream-json --verbose`, which reports `total_cost_usd`
 (a client-side estimate). Each task's check script decides pass or fail.
 
 Requires the `claude` CLI. The default uses `--bare` with ANTHROPIC_API_KEY.
@@ -88,11 +88,12 @@ def build_command(
     if variant not in VARIANTS:
         raise ValueError(f"unknown variant: {variant}")
     prompt = task.prompt if variant == "baseline" else f"/tierly:tierly --yes {task.prompt}"
-    auth_flags = ["--safe-mode", "--strict-mcp-config"] if auth == "subscription" else ["--bare"]
+    auth_flags = (["--setting-sources", "project,local", "--strict-mcp-config"]
+                  if auth == "subscription" else ["--bare"])
     cmd = [
         "claude", *auth_flags, "-p", prompt,
         "--model", "opus",
-        "--output-format", "json",
+        "--output-format", "stream-json", "--verbose",
         "--permission-mode", "acceptEdits",
         "--allowedTools", task.allowed_tools,
     ]
@@ -106,14 +107,28 @@ def build_command(
 
 
 def parse_result(stdout: str) -> dict[str, Any]:
-    """Extract cost and status fields from `claude -p --output-format json` output."""
-    try:
-        data = json.loads(stdout)
-    except json.JSONDecodeError:
-        return {"parse_error": True, "total_cost_usd": None, "is_error": True}
-    if not isinstance(data, dict):
-        return {"parse_error": True, "total_cost_usd": None, "is_error": True}
+    """Extract init and final result fields from stream-json output."""
+    init_data: dict[str, Any] | None = None
+    result_data: dict[str, Any] | None = None
+    for line in stdout.splitlines():
+        try:
+            data = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(data, dict):
+            continue
+        if data.get("type") == "system" and data.get("subtype") == "init":
+            init_data = data
+        elif data.get("type") == "result":
+            result_data = data
+    slash_commands = init_data.get("slash_commands", []) if init_data else []
+    plugin_loaded = "tierly:tierly" in slash_commands if isinstance(slash_commands, list) else False
+    if result_data is None:
+        return {"parse_error": True, "total_cost_usd": None, "is_error": True,
+                "plugin_loaded": plugin_loaded, "models_used": []}
+    data = result_data
     per_model = data.get("modelUsage", data.get("model_usage"))
+    models_used = sorted(per_model) if isinstance(per_model, dict) else []
     result_text = data.get("result")
     if not isinstance(result_text, str):
         result_text = None
@@ -126,6 +141,8 @@ def parse_result(stdout: str) -> dict[str, Any]:
         "num_turns": data.get("num_turns"),
         "duration_ms": data.get("duration_ms"),
         "per_model": per_model,
+        "models_used": models_used,
+        "plugin_loaded": plugin_loaded,
         "result": result_text,
     }
 
@@ -159,9 +176,15 @@ def run_one(
             result["stderr"] = proc.stderr[:500]
         except subprocess.TimeoutExpired:
             result = {"parse_error": False, "total_cost_usd": None, "is_error": True,
-                      "exit_code": None, "timeout": True, "result": None, "stderr": ""}
+                      "exit_code": None, "timeout": True, "result": None,
+                      "stderr": "", "plugin_loaded": False, "models_used": []}
         result["wall_s"] = round(time.time() - started, 1)
         result["passed"] = run_check(task, workdir)
+        if variant == "tierly" and not result.get("plugin_loaded", False):
+            result["passed"] = False
+            result["invalid"] = "plugin not loaded"
+            print(f"warning: {task.id} tierly run did not load the Tierly plugin",
+                  file=sys.stderr)
     return {"task": task.id, "kind": task.kind, "variant": variant, **result}
 
 

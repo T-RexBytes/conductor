@@ -403,14 +403,14 @@ E7 and E8 stay manual.
 
 Each task runs in two variants from clean copies of its fixture: **baseline** (`claude --bare -p` with
 `--model opus`, no plugin) and **tierly** (`--plugin-dir ./plugins/tierly`, prompt
-`/tierly:tierly --yes <task>`). Both use `--output-format json`; the runner logs
+`/tierly:tierly --yes <task>`). Both use `--output-format stream-json --verbose`; the runner logs
 `total_cost_usd` and the per-model breakdown, then runs the task's check script for pass or fail.
 Use `--repeat` to repeat each task and variant from a fresh fixture copy, and
 `--baseline-effort` to set the explicit baseline effort (default `medium`), which the harness
 records in every results row. A routing change is accepted only if mean pass rate does not drop
 and mean cost per run does not rise on the suite.
 Use `--auth subscription` to run with a Claude subscription login and report costs as list-price
-estimates.
+estimates; the harness verifies that the Tierly plugin loaded from the session init event.
 
 ## 12. Release and maintenance
 
