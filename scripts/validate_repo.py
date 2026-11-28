@@ -55,6 +55,10 @@ SKILL_MAX_LINES = 500
 DESCRIPTION_MAX_CHARS = 1536
 SEMVER = re.compile(r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$")
 SKILL_REF = re.compile(r"\$\{CLAUDE_SKILL_DIR\}/([\w./-]+\.(?:md|json))")
+ROUTING_CARD_ROW = re.compile(
+    r"^\| (?P<id>[^|]+) \| (?P<agent>[^|]+) \| (?P<model>[^|]+) \| "
+    r"(?P<effort>[^|]+) \| (?P<band>[^|]+) \| (?P<writes>[^|]+) \|$"
+)
 
 
 class Report:
@@ -201,6 +205,55 @@ def check_skill(plugin_dir: Path, rep: Report) -> None:
             rep.error(where, f"referenced file does not exist: {ref}")
 
 
+def check_routing_card(plugin_dir: Path, tiers: dict[str, Any] | None, rep: Report) -> None:
+    where = f"plugins/{PLUGIN_NAME}/skills/tierly/SKILL.md"
+    skill = plugin_dir / "skills" / "tierly" / "SKILL.md"
+    if tiers is None or not skill.exists():
+        return
+    text = skill.read_text(encoding="utf-8")
+    start = text.find("## Routing card\n")
+    end = text.find("\n## 3. Triage gate\n", start + 1)
+    if start == -1 or end == -1:
+        rep.error(where, "routing card is missing or not placed before the triage gate")
+        return
+    rows: dict[str, dict[str, str]] = {}
+    for line in text[start:end].splitlines():
+        match = ROUTING_CARD_ROW.match(line)
+        if match:
+            row = match.groupdict()
+            rows[row["id"]] = row
+    for tier in tiers.get("tiers", []):
+        check_routing_card_tier(tier, rows, where, rep)
+    watcher = tiers.get("watcher")
+    if isinstance(watcher, dict):
+        row = rows.get("watcher")
+        if row is None:
+            rep.error(where, "routing card row 'watcher' is missing")
+        else:
+            for key in ("agent", "model", "effort"):
+                if row[key] != str(watcher.get(key)):
+                    rep.error(where, f"routing card row 'watcher' {key} does not match tiers.json")
+
+
+def check_routing_card_tier(tier: dict[str, Any], rows: dict[str, dict[str, str]],
+                            where: str, rep: Report) -> None:
+    tid = str(tier.get("id"))
+    row = rows.get(tid)
+    if row is None:
+        rep.error(where, f"routing card row '{tid}' is missing")
+        return
+    expected = {
+        "agent": str(tier.get("agent")),
+        "model": str(tier.get("model")),
+        "effort": str(tier.get("effort")),
+        "band": f"{tier.get('score_min')}-{tier.get('score_max')}",
+        "writes": "yes" if tier.get("writes") else "no",
+    }
+    for key, value in expected.items():
+        if row[key] != value:
+            rep.error(where, f"routing card row '{tid}' {key} does not match tiers.json")
+
+
 def check_agents(plugin_dir: Path, rep: Report) -> dict[str, dict[str, Any]]:
     agents_dir = plugin_dir / "agents"
     found: dict[str, dict[str, Any]] = {}
@@ -300,6 +353,7 @@ def check_tiers(plugin_dir: Path, agents: dict[str, dict[str, Any]], rep: Report
     if not (isinstance(default_parallel, int) and isinstance(max_parallel, int)
             and 1 <= default_parallel <= max_parallel <= 20):
         rep.error(where, "need 1 <= default_parallel <= max_parallel <= 20")
+    check_routing_card(plugin_dir, data, rep)
 
 
 def check_role_matches_agent(role: dict[str, Any], agents: dict[str, dict[str, Any]],

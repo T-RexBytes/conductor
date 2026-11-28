@@ -45,7 +45,7 @@ python benchmarks/run_benchmark.py --dry-run    # show benchmark commands withou
 2. **No probing.** Neither the skill nor any agent may tell Claude to run web, network or shell
    actions for Tierly's own purposes. Such actions happen only when the user's task needs them
    and the plan lists them.
-3. **`tiers.json` is authoritative.** Changing a tier's model or effort means changing
+3. **`tiers.json` is authoritative.** The SKILL.md routing card must match `tiers.json`, and the validator checks it. Changing a tier's model or effort means changing
    `tiers.json`, the matching agent frontmatter, `ROUTING.md`, `BUILD-SPEC.md` section 5.4, and
    the README table in the same PR. The validator checks agents against `tiers.json`.
 4. **Only documented frontmatter keys.** Claude Code silently ignores unknown keys, so a typo

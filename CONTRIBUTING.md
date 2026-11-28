@@ -42,6 +42,8 @@ Then run `/tierly --plan-only <some task>` in a scratch project.
 | New flag or feature | An issue agreed first; spec update in the same PR |
 | New frontmatter key | A link to the Claude Code docs that defines it; validator allowlist updated |
 
+The SKILL.md routing card must match `tiers.json`, and the validator checks it.
+
 ## Routing changes need benchmark evidence
 
 1. Run the suite on `main`: `python benchmarks/run_benchmark.py --out before.jsonl`

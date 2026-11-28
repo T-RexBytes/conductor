@@ -65,18 +65,41 @@ def test_skill_must_disable_model_invocation(repo: Path) -> None:
 
 
 def test_skill_hooks_rejected(repo: Path) -> None:
-    replace(repo / SKILL, "effort: high\n---", "effort: high\nhooks: {}\n---")
+    replace(repo / SKILL, "name: tierly\n", "name: tierly\nhooks: {}\n")
     assert "skill hooks persist" in errors_for(repo)
 
 
 def test_skill_disallowed_tools_rejected(repo: Path) -> None:
-    replace(repo / SKILL, "effort: high\n---", "effort: high\ndisallowed-tools: Bash\n---")
+    replace(repo / SKILL, "name: tierly\n", "name: tierly\ndisallowed-tools: Bash\n")
     assert "disallowed-tools would hide" in errors_for(repo)
 
 
 def test_skill_unknown_key(repo: Path) -> None:
-    replace(repo / SKILL, "effort: high\n---", "effort: high\nmodle: opus\n---")
+    replace(repo / SKILL, "name: tierly\n", "name: tierly\nmodle: opus\n")
     assert "undocumented frontmatter keys" in errors_for(repo)
+
+
+def test_routing_card_matches_tiers(repo: Path) -> None:
+    assert "routing card" not in errors_for(repo).lower()
+
+
+def test_routing_card_model_mismatch_rejected(repo: Path) -> None:
+    replace(repo / SKILL, "| builder | tierly:builder | sonnet | medium | 5-7 | yes |", "| builder | tierly:builder | haiku | medium | 5-7 | yes |")
+    assert "routing card row 'builder'" in errors_for(repo)
+
+
+def test_routing_card_band_mismatch_rejected(repo: Path) -> None:
+    replace(repo / SKILL, "| builder | tierly:builder | sonnet | medium | 5-7 | yes |", "| builder | tierly:builder | sonnet | medium | 6-7 | yes |")
+    assert "routing card row 'builder'" in errors_for(repo)
+
+
+def test_routing_card_missing_rejected(repo: Path) -> None:
+    path = repo / SKILL
+    text = path.read_text(encoding="utf-8")
+    start = text.index("## Routing card\n")
+    end = text.index("## 3. Triage gate\n", start)
+    path.write_text(text[:start] + text[end:], encoding="utf-8")
+    assert "routing card" in errors_for(repo).lower()
 
 
 def test_skill_rule_marker_required(repo: Path) -> None:

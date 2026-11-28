@@ -71,13 +71,37 @@ payment client? Return paths and one-line roles."). Reconnaissance is local and 
 Read, Glob and Grep inside the project. Never web, never shell. Keep it to what planning
 needs, at most 3 scouts.
 
+## Routing card
+
+| Tier | Agent | Model | Effort | Score band | Writes |
+|---|---|---|---|---|---|
+| scout | tierly:scout | haiku | low | 0-2 | no |
+| worker | tierly:worker | haiku | medium | 3-4 | yes |
+| builder | tierly:builder | sonnet | medium | 5-7 | yes |
+| builder-plus | tierly:builder-plus | sonnet | high | 8-9 | yes |
+| architect | tierly:architect | opus | high | 10-12 | yes |
+| watcher | tierly:watcher | sonnet | high | n/a | no |
+
+Profiles shift every score: `budget -2`, `balanced 0`, `quality +2`.
+Cost index (list-price ratio, for plan and report estimates): haiku 1, sonnet 20, opus 40.
+Hard floors: writes start at `worker`.
+Hard floors: Breadth 3 starts at `builder`.
+Hard floors: Risk 3 design or decisions use `architect`.
+Hard floors: Risk 3 implementation uses `builder-plus` and requires the watcher.
+Hard floors: Complexity 3 with Ambiguity 2 or 3 uses `architect`.
+Hard floors: Ambiguity 3 means ask the user; do not dispatch.
+The watcher reviews every writing task scored 5 or more, every Risk 2 or more task, every
+quality-profile writing task, and every partial or malformed report.
+
 ## 3. Triage gate
 
 Pick the lightest mode that fits. Orchestration has overhead; do not pay it when it does not
 pay back.
 
-Triage needs scores, so read `${CLAUDE_SKILL_DIR}/reference/ROUTING.md` and
-`${CLAUDE_SKILL_DIR}/reference/tiers.json` now and score the work as section 5 describes.
+Triage needs scores, so score the work from the Routing card as section 5 describes. Read
+`${CLAUDE_SKILL_DIR}/reference/ROUTING.md` only when an axis score is unclear or the task is
+near a score-band edge, for axis definitions and worked examples. Do not read `tiers.json`
+during a run: each extra read is paid on the most expensive model.
 
 - **Direct dispatch.** The request is one micro-task (or two strictly sequential ones), every
   score is 7 or less, and the Risk axis is 1 or less. Dispatch in three steps, in order.
@@ -106,9 +130,10 @@ context, the brief, re-reading files).
 
 ## 5. Score and route
 
-Use the rubric in `${CLAUDE_SKILL_DIR}/reference/ROUTING.md` and the tier table in
-`${CLAUDE_SKILL_DIR}/reference/tiers.json` (read them in section 3 if you have not yet). Do not
-invent tiers, models or effort levels that are not in `tiers.json`.
+Use the Routing card for tiers, models, effort levels and score bands. Read
+`${CLAUDE_SKILL_DIR}/reference/ROUTING.md` only when an axis score is unclear or the task is
+near a score-band edge, for axis definitions and worked examples. Do not read `tiers.json`
+during a run: each extra read is paid on the most expensive model.
 
 For each micro-task:
 
@@ -206,7 +231,7 @@ comparison with a note that orchestration overhead may exceed the saving on task
 ## Reference files
 
 - `${CLAUDE_SKILL_DIR}/reference/ROUTING.md`: scoring rubric, hard floors, worked examples
-- `${CLAUDE_SKILL_DIR}/reference/tiers.json`: tiers, models, effort levels, bands, cost index
+- `${CLAUDE_SKILL_DIR}/reference/tiers.json`: validator source of truth for tiers, models, effort levels and bands
 - `${CLAUDE_SKILL_DIR}/reference/PLAN_TEMPLATE.md`: the plan format
 - `${CLAUDE_SKILL_DIR}/reference/BRIEF_TEMPLATE.md`: the subagent brief format
 - `${CLAUDE_SKILL_DIR}/reference/WATCHER_RUBRIC.md`: what the watcher checks and the verdict format

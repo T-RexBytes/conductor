@@ -103,7 +103,7 @@ parse args → understand request (ask if ambiguous) → [recon via scouts]
 | Marketplace manifest | `.claude-plugin/marketplace.json` | Makes the repo installable |
 | Plugin manifest | `plugins/tierly/.claude-plugin/plugin.json` | Name, version, metadata |
 | Orchestrator skill | `plugins/tierly/skills/tierly/SKILL.md` | The procedure; runs on Opus at medium effort for its turn |
-| Routing table | `plugins/tierly/skills/tierly/reference/tiers.json` | Single source of truth for tiers |
+| Routing table | `plugins/tierly/skills/tierly/reference/tiers.json` | Single source of truth for tiers; the SKILL.md routing card must match it and the validator checks it |
 | Rubric | `plugins/tierly/skills/tierly/reference/ROUTING.md` | Scoring axes, floors, watcher policy, examples |
 | Templates | `plugins/tierly/skills/tierly/reference/*_TEMPLATE.md`, `WATCHER_RUBRIC.md` | Plan, brief, report and verdict formats |
 | Agents | `plugins/tierly/agents/*.md` | scout, worker, builder, builder-plus, architect, watcher |
@@ -182,7 +182,7 @@ Effort choices follow Anthropic's per-model guidance as of the snapshot date:
 - **Fable** is not used. It costs well above Opus and is reserved for frontier problems; a future
   opt-in flag may allow it.
 
-`tiers.json` is validated in CI against the agent files (section 10).
+The SKILL.md routing card must match `tiers.json`, and the validator checks it.
 
 ### 5.5 Scoring
 
@@ -369,6 +369,8 @@ key from repository secrets. It never runs on pull requests from forks.
 - `tiers.json`: score bands are contiguous over 0–12 with no overlap; every tier's agent file
   exists and its `model` and `effort` match the agent frontmatter; `escalation_order` lists every
   tier once, cheapest first; the watcher entry matches `watcher.md`; scout has `writes: false`.
+- The SKILL.md routing card matches `tiers.json` for every tier and the watcher; the validator
+  checks the copied agent, model, effort and score-band values.
 - Forbidden plugin paths (N2, N3) are absent.
 
 ## 11. Testing strategy
