@@ -29,3 +29,8 @@ All notable changes to this project are documented here. The format follows
   only, excluding the orchestrator's own Opus usage.
 - GitHub-only distribution through this repo's own marketplace, with no directory listing.
 - Monthly Dependabot updates grouped by ecosystem. Text files use LF line endings.
+- Plugin icon and manual release checklist.
+- Benchmark `--auth subscription` mode and `--max-cost-usd` cap, with a usage-limit stop.
+- Skill reports instructions embedded in files, marks denied steps as blocked, and never skips
+  required watcher reviews.
+- Skill stops when its agents are unavailable.

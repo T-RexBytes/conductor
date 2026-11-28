@@ -144,6 +144,9 @@ For each ready task (all of its dependencies are done), write a brief from
 (`tierly:scout`, `tierly:worker`, `tierly:builder`, `tierly:builder-plus`,
 `tierly:architect`).
 
+- If the `tierly:*` agents are unavailable in this session because the plugin is not fully loaded or
+  this is not Claude Code, say so and stop; the point is to route work to cheaper tiers, so doing it
+  on the orchestrator model would defeat that purpose and mislead the user about cost.
 - Run independent tasks in parallel, up to the `--parallel` limit.
 - A brief carries only what the task needs: the goal, paths, the facts that scouts found,
   constraints, allowed actions and the definition of done. No conversation history.

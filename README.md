@@ -30,11 +30,11 @@ In Claude Code:
 
 ## Use
 
+Type `/tierly` (or `/tierly:tierly` if the name is taken), followed by your task:
+
 ```text
 /tierly [--plan-only] [--yes] [--no-recon] [--profile budget|balanced|quality] [--parallel N] <task>
 ```
-
-If `/tierly` is taken by another command, type `/tierly:tierly`.
 
 | Flag | Effect | Default |
 |---|---|---|
@@ -100,11 +100,14 @@ models. The report shows a relative cost index, not a bill. On a subscription, s
 counts toward the same limits as your main conversation. See
 [docs/SAVINGS-MODEL.md](docs/SAVINGS-MODEL.md).
 
-## Requirements
+## Requirements and compatibility
 
-- Claude Code with plugin support.
-- Access to Haiku, Sonnet and Opus. If Opus is unavailable, review falls back to Sonnet at high
-  effort and the report says so.
+- Claude Code only. Tierly dispatches Claude Code subagents (`tierly:*`) with set models and effort
+  levels. It does not run on claude.ai, the Skills API or other agent harnesses.
+- A Claude plan or API access with Haiku, Sonnet and Opus.
+- If Opus is unavailable, review falls back to Sonnet at high effort and the report says so.
+- The skill loads only when you type `/tierly`. Between runs, only six short agent descriptions sit
+  in context. Tierly adds no hooks, MCP servers or settings changes.
 
 ## Documentation
 
