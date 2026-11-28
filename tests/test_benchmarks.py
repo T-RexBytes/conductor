@@ -62,12 +62,14 @@ def test_build_command_variants(auth: str, auth_flags: list[str]) -> None:
 
 def test_parse_result_fields() -> None:
     out = json.dumps({"total_cost_usd": 0.42, "is_error": False, "num_turns": 7,
-                      "duration_ms": 1234, "modelUsage": {"claude-haiku-5-5": {}}})
+                      "duration_ms": 1234, "result": "done",
+                      "modelUsage": {"claude-haiku-5-5": {}}})
     parsed = rb.parse_result(out)
     assert parsed["total_cost_usd"] == 0.42
     assert parsed["is_error"] is False
     assert parsed["num_turns"] == 7
     assert parsed["per_model"] == {"claude-haiku-5-5": {}}
+    assert parsed["result"] == "done"
 
 
 @pytest.mark.parametrize("bad", ["not json", "[]", ""])
@@ -106,6 +108,55 @@ def test_dry_run_repeats_and_sets_baseline_effort(
     for run, line in enumerate((tierly_1, tierly_2), start=1):
         assert line.startswith(f"[T01 tierly run {run}] claude --bare -p '/tierly:tierly --yes")
         assert "--effort" not in line
+
+
+def test_cost_cap_stops_runs_and_returns_partial_summary(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    calls = 0
+
+    def fake_run(task: rb.Task, variant: str, baseline_effort: str, auth: str) -> dict[str, Any]:
+        nonlocal calls
+        calls += 1
+        return {"task": task.id, "variant": variant, "passed": True,
+                "total_cost_usd": 1.0}
+
+    monkeypatch.setattr(shutil, "which", lambda _: "claude")
+    monkeypatch.setattr(rb, "run_one", fake_run)
+    result = tmp_path / "results.jsonl"
+    code = rb.main(["--tasks", "T01", "--repeat", "3", "--max-cost-usd", "2",
+                    "--out", str(result)])
+    assert code == 3
+    assert calls == 2
+    assert len(result.read_text(encoding="utf-8").splitlines()) == 2
+    captured = capsys.readouterr()
+    assert "skipped 4 runs" in captured.err
+    assert "partial: stopped at cost cap after 2 of 6 runs" in captured.out
+
+
+def test_missing_cost_counts_as_zero_and_usage_limit_stops_suite(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    calls = 0
+
+    def fake_run(task: rb.Task, variant: str, baseline_effort: str, auth: str) -> dict[str, Any]:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return {"task": task.id, "variant": variant, "passed": True}
+        return {"task": task.id, "variant": variant, "passed": False,
+                "total_cost_usd": 0.5, "is_error": True,
+                "result": "weekly limit reached"}
+
+    monkeypatch.setattr(shutil, "which", lambda _: "claude")
+    monkeypatch.setattr(rb, "run_one", fake_run)
+    code = rb.main(["--tasks", "T01", "--repeat", "3", "--max-cost-usd", "0.5"])
+    assert code == 3
+    assert calls == 2
+    captured = capsys.readouterr()
+    assert "usage-limit error" in captured.err
+    assert "missing costs counted as $0 toward the cap" in captured.err
+    assert "partial: stopped after usage-limit error after 2 of 6 runs" in captured.out
 
 
 @pytest.mark.parametrize("repeat", [0, -1])

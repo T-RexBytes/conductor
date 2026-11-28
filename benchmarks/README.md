@@ -28,7 +28,7 @@ Subscription runs count against your plan's usage limits, so start with a small 
 The reported dollar amounts are CLI list-price estimates for comparison only.
 
 ```bash
-python benchmarks/run_benchmark.py --auth subscription --tasks T03,T06 --repeat 1
+python benchmarks/run_benchmark.py --auth subscription --tasks T03,T06 --repeat 1 --max-cost-usd 3
 ```
 
 `--repeat N` runs each task and variant N times (default 1, minimum 1). The dry run prints
@@ -36,6 +36,9 @@ each command with its run index. `--baseline-effort` accepts `low`, `medium`, or
 defaults to `medium`, the documented Opus default. The Tierly skill sets its orchestrator's
 effort. Each JSONL row records the run index, selected baseline effort, and auth mode.
 The summary reports pass rate over all runs and mean cost over runs with a reported cost.
+`--max-cost-usd FLOAT` stops before launching another run once completed reported costs reach
+the cap. Runs without a reported cost count as zero. A capped or usage-limited suite writes the
+completed rows and a partial summary, then exits with status 3.
 
 API-key runs incur API charges. In CI the suite runs only on manual dispatch (`benchmark.yml`).
 

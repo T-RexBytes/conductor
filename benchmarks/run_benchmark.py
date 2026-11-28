@@ -17,6 +17,7 @@ Usage:
     python benchmarks/run_benchmark.py [--tasks T01,T02] [--variants baseline,tierly]
                                        [--repeat N] [--baseline-effort low|medium|high]
                                        [--auth api-key|subscription]
+                                       [--max-cost-usd FLOAT]
                                        [--out results.jsonl] [--dry-run]
 """
 
@@ -40,6 +41,7 @@ PLUGIN_DIR = REPO_ROOT / "plugins" / "tierly"
 VARIANTS = ("baseline", "tierly")
 DEFAULT_BASELINE_EFFORT = "medium"
 DEFAULT_AUTH = "api-key"
+USAGE_LIMIT_PHRASES = ("usage limit", "5-hour limit", "weekly limit")
 
 
 @dataclass(frozen=True)
@@ -112,6 +114,11 @@ def parse_result(stdout: str) -> dict[str, Any]:
     if not isinstance(data, dict):
         return {"parse_error": True, "total_cost_usd": None, "is_error": True}
     per_model = data.get("modelUsage", data.get("model_usage"))
+    result_text = data.get("result")
+    if not isinstance(result_text, str):
+        result_text = None
+    else:
+        result_text = result_text[:500]
     return {
         "parse_error": False,
         "total_cost_usd": data.get("total_cost_usd"),
@@ -119,6 +126,7 @@ def parse_result(stdout: str) -> dict[str, Any]:
         "num_turns": data.get("num_turns"),
         "duration_ms": data.get("duration_ms"),
         "per_model": per_model,
+        "result": result_text,
     }
 
 
@@ -148,16 +156,21 @@ def run_one(
             )
             result = parse_result(proc.stdout)
             result["exit_code"] = proc.returncode
+            result["stderr"] = proc.stderr[:500]
         except subprocess.TimeoutExpired:
             result = {"parse_error": False, "total_cost_usd": None, "is_error": True,
-                      "exit_code": None, "timeout": True}
+                      "exit_code": None, "timeout": True, "result": None, "stderr": ""}
         result["wall_s"] = round(time.time() - started, 1)
         result["passed"] = run_check(task, workdir)
     return {"task": task.id, "kind": task.kind, "variant": variant, **result}
 
 
-def summarize(rows: list[dict[str, Any]], auth: str = DEFAULT_AUTH) -> str:
-    lines = [f"Benchmark summary (auth mode {auth})", "",
+def summarize(rows: list[dict[str, Any]], auth: str = DEFAULT_AUTH,
+              partial_reason: str | None = None) -> str:
+    title = f"Benchmark summary (auth mode {auth})"
+    if partial_reason:
+        title += f" [partial: {partial_reason}]"
+    lines = [title, "",
              "| Task | Variant | Run | Passed | Cost (USD, est.) | Wall (s) |",
              "|---|---|---|---|---|---|"]
     totals: dict[str, float] = {v: 0.0 for v in VARIANTS}
@@ -194,6 +207,21 @@ def summarize(rows: list[dict[str, Any]], auth: str = DEFAULT_AUTH) -> str:
     return "\n".join(lines)
 
 
+def has_usage_limit_error(row: dict[str, Any]) -> bool:
+    """Return whether an errored run reports a Claude usage limit."""
+    if not row.get("is_error"):
+        return False
+    text = " ".join(str(row.get(field, "")) for field in ("result", "stderr"))
+    lowered = text.lower()
+    return any(phrase in lowered for phrase in USAGE_LIMIT_PHRASES)
+
+
+def row_cost(row: dict[str, Any]) -> float:
+    """Return a completed run's cap cost; missing or invalid costs count as zero."""
+    cost = row.get("total_cost_usd")
+    return float(cost) if isinstance(cost, (int, float)) else 0.0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run the Tierly benchmark suite.")
     parser.add_argument("--tasks", default="", help="comma-separated task ids (default: all)")
@@ -203,11 +231,15 @@ def main(argv: list[str] | None = None) -> int:
                         default=DEFAULT_BASELINE_EFFORT, help="baseline Opus effort (default: medium)")
     parser.add_argument("--auth", choices=("api-key", "subscription"), default=DEFAULT_AUTH,
                         help="Claude authentication mode (default: api-key)")
+    parser.add_argument("--max-cost-usd", type=float, default=None,
+                        help="stop before a run when completed cost reaches this cap")
     parser.add_argument("--out", type=Path, default=None, help="write JSONL results here")
     parser.add_argument("--dry-run", action="store_true", help="print commands only")
     args = parser.parse_args(argv)
     if args.repeat < 1:
         parser.error("--repeat must be at least 1")
+    if args.max_cost_usd is not None and args.max_cost_usd < 0:
+        parser.error("--max-cost-usd must not be negative")
 
     selected = {t.strip() for t in args.tasks.split(",") if t.strip()} or None
     variants = [v.strip() for v in args.variants.split(",") if v.strip()]
@@ -220,7 +252,10 @@ def main(argv: list[str] | None = None) -> int:
         print("error: the claude CLI is not on PATH", file=sys.stderr)
         return 2
 
-    rows = []
+    rows: list[dict[str, Any]] = []
+    total_runs = len(tasks) * len(variants) * args.repeat
+    stopped_reason: str | None = None
+    missing_cost_seen = False
     for task in tasks:
         for variant in variants:
             for run in range(1, args.repeat + 1):
@@ -229,18 +264,42 @@ def main(argv: list[str] | None = None) -> int:
                     command = build_command(task, variant, args.baseline_effort, args.auth)
                     print(f"[{label}] {shlex.join(command)}")
                     continue
+                if args.max_cost_usd is not None:
+                    spent = sum(row_cost(row) for row in rows)
+                    if spent >= args.max_cost_usd:
+                        stopped_reason = (f"stopped at cost cap after {len(rows)} of "
+                                          f"{total_runs} runs")
+                        break
                 print(f"running {label}...", file=sys.stderr)
                 row = run_one(task, variant, args.baseline_effort, args.auth)
-                rows.append({**row, "run": run, "baseline_effort": args.baseline_effort,
-                             "auth": args.auth})
+                row = {**row, "run": run, "baseline_effort": args.baseline_effort,
+                       "auth": args.auth}
+                rows.append(row)
+                if "total_cost_usd" not in row or not isinstance(
+                        row.get("total_cost_usd"), (int, float)):
+                    missing_cost_seen = True
+                if has_usage_limit_error(row):
+                    stopped_reason = (f"stopped after usage-limit error after {len(rows)} of "
+                                      f"{total_runs} runs")
+                    break
+            if stopped_reason:
+                break
+        if stopped_reason:
+            break
     if args.dry_run:
         return 0
+    if stopped_reason:
+        skipped = total_runs - len(rows)
+        note = ""
+        if args.max_cost_usd is not None and missing_cost_seen:
+            note = "; missing costs counted as $0 toward the cap"
+        print(f"{stopped_reason}; skipped {skipped} runs{note}", file=sys.stderr)
     if args.out:
         with args.out.open("w", encoding="utf-8") as fh:
             for row in rows:
                 fh.write(json.dumps(row) + "\n")
-    print(summarize(rows, args.auth))
-    return 0
+    print(summarize(rows, args.auth, stopped_reason))
+    return 3 if stopped_reason else 0
 
 
 if __name__ == "__main__":
