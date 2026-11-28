@@ -3,6 +3,10 @@
 How Tierly's cost compares with running everything on one model, how it is estimated during a
 run, and how it is measured.
 
+This is a model, not a measurement. The [measured pilot](BENCHMARK-RESULTS.md) shows higher cost
+on small tasks. The model's assumptions apply to larger delegated work, which has not yet been
+measured.
+
 ## Where cost goes up and down
 
 | Effect | Direction | Size |
@@ -37,10 +41,10 @@ cache-write price is assumed to be 1.25x its input price.
 
 | Role | Model | Uncached in | Cache write | Cache read | Output | Cost |
 |---|---|---|---|---|---|---|
-| Orchestrator | Opus | 30k | 40k | 400k | 15k | $0.70 |
+| Orchestrator (medium effort) | Opus | 30k | 40k | 400k | 15k | $0.70 |
 | 4 scouts | Haiku | 200k | 100k | 1,000k | 20k | $0.05 |
 | Builders | Sonnet | 100k | 150k | 1,500k | 50k | $1.23 |
-| Watcher | Sonnet | 60k | 0 | 100k | 10k | $0.23 |
+| Watcher (high effort) | Sonnet | 60k | 0 | 100k | 10k | $0.23 |
 | **Total** | | | | | 3,775k tokens | **$2.21** |
 
 Result: about **42% lower cost** with about **10% more tokens**. All token counts are assumptions

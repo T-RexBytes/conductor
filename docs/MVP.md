@@ -56,25 +56,26 @@ The MVP ships when every item below is true.
 
 ### Functional
 
-- [ ] A1. Fresh install from the GitHub marketplace works; `/tierly` appears in the `/` menu.
+- [x] A1. Fresh install from the GitHub marketplace works; `/tierly` appears in the `/` menu.
 - [ ] A2. Behavioral evals E1–E10 from BUILD-SPEC section 11.2 pass and are recorded in the
       release PR.
-- [ ] A3. On the seed benchmark tasks, Tierly's pass rate equals the baseline's.
+- [x] A3. On the seed benchmark tasks, Tierly's pass rate equals the baseline's.
 - [ ] A4. On the seed benchmark tasks, Tierly's total cost is lower than the baseline's.
-- [ ] A5. A one-line request takes the direct-dispatch path with no approval prompt.
-- [ ] A6. `--plan-only` writes no files and dispatches nothing.
+      See [benchmark results](BENCHMARK-RESULTS.md); this criterion is not met yet.
+- [x] A5. A one-line request takes the direct-dispatch path with no approval prompt.
+- [x] A6. `--plan-only` writes no files and dispatches nothing.
 
 ### Non-interference
 
-- [ ] A7. CI enforces N1–N5, N10 and the static parts of N6, N7 and N11.
+- [x] A7. CI enforces N1–N5, N10 and the static parts of N6, N7 and N11.
 - [ ] A8. Manual checks for N6–N9 and N11 pass (no probing commands, no settings changes, model
       override ends with the run, no stray files, denied permissions not worked around).
 
 ### Quality and project hygiene
 
-- [ ] A9. All CI jobs green on `main`.
+- [x] A9. All CI jobs green on `main`.
 - [ ] A10. Verification items V1–V5 resolved and the spec updated with the answers.
-- [ ] A11. README states savings only as modeled ranges until benchmarks show measured numbers.
+- [x] A11. README states savings only as modeled ranges until benchmarks show measured numbers.
 - [ ] A12. CHANGELOG has the 0.1.0 entry; tag `v0.1.0` created.
 
 ## 6. Success metrics (first 30 days after release)

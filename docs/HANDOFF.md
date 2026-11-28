@@ -1,6 +1,6 @@
 # HANDOFF
 
-Snapshot date: 2026-11-28
+Snapshot date: 2026-11-29
 
 Read first: `CLAUDE.md`, then `docs/MVP.md` and `docs/BUILD-SPEC.md`.
 
@@ -9,23 +9,23 @@ Read first: `CLAUDE.md`, then `docs/MVP.md` and `docs/BUILD-SPEC.md`.
 - The 0.1.0 items listed under Added in CHANGELOG.md: orchestrator, six agents, routing,
   non-interference checks, validator, CI, benchmark harness and tasks, documentation, evals,
   routing clarifications, live-eval fixes, GitHub marketplace distribution and Dependabot.
-- Live evals: E1, E2, E4, E6 and E9 passed. E3 passed except its one-line plan printed in 2 of 3
-  runs. E5 and E10 exposed gaps; fixes are in the skill and are being re-checked. E7, E8, V1, V3
-  and V4 are manual checks in MANUAL-CHECKS.md.
+- Current behavioral evals: E1, E2, E3, E5, E9 and E10 pass. E4 and E6 passed as headless runs.
+  E7, E8, V1, V3 and V4 are manual checks in MANUAL-CHECKS.md. Earlier runs printed E3's plan
+  line in about 2 of 3 runs.
 - GitHub install checked with Claude Code 2.1.332: marketplace add and plugin install succeeded,
   the plugin was enabled, and `claude plugin validate` passed.
 - CI is green.
-- The benchmark harness has 10 tasks, but there are no valid measured results yet. Savings remain
-  modeled ranges.
+- Benchmark experiments completed for T03 and T06, including the effort, watcher, and routing
+  card configurations. See docs/BENCHMARK-RESULTS.md; current Tierly costs more on these tasks.
 
 ## Remaining, in order
 
-1. Re-check E5 and E10.
-2. Re-check the one-line plan in E3.
-3. Run benchmarks in subscription mode once the harness fix lands.
-4. Complete the manual checks in MANUAL-CHECKS.md.
-5. Complete the MVP section 5 checkboxes.
-6. Tag v0.1.0.
+1. Complete the manual checks in MANUAL-CHECKS.md.
+2. Resolve V1, V3 and V4.
+3. Review Dependabot PRs #9 and #10; they wait for the owner's OK.
+4. Reach lower cost than baseline (A4).
+5. Create the v0.1.0 tag.
+6. Set branch protection when the owner asks.
 
 ## Running checks
 

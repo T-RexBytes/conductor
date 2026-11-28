@@ -34,3 +34,8 @@ All notable changes to this project are documented here. The format follows
 - Skill reports instructions embedded in files, marks denied steps as blocked, and never skips
   required watcher reviews.
 - Skill stops when its agents are unavailable.
+- Current routing uses Opus at medium effort for the orchestrator and Sonnet at high effort for
+  the watcher. The compact routing card is checked by the validator against `tiers.json`; see
+  `docs/BENCHMARK-RESULTS.md`.
+- Added a brand icon and wordmark.
+- Added the full code of conduct in `CODE_OF_CONDUCT.md`.
