@@ -102,7 +102,7 @@ parse args → understand request (ask if ambiguous) → [recon via scouts]
 |---|---|---|
 | Marketplace manifest | `.claude-plugin/marketplace.json` | Makes the repo installable |
 | Plugin manifest | `plugins/tierly/.claude-plugin/plugin.json` | Name, version, metadata |
-| Orchestrator skill | `plugins/tierly/skills/tierly/SKILL.md` | The procedure; runs on Opus at high effort for its turn |
+| Orchestrator skill | `plugins/tierly/skills/tierly/SKILL.md` | The procedure; runs on Opus at medium effort for its turn |
 | Routing table | `plugins/tierly/skills/tierly/reference/tiers.json` | Single source of truth for tiers |
 | Rubric | `plugins/tierly/skills/tierly/reference/ROUTING.md` | Scoring axes, floors, watcher policy, examples |
 | Templates | `plugins/tierly/skills/tierly/reference/*_TEMPLATE.md`, `WATCHER_RUBRIC.md` | Plan, brief, report and verdict formats |
@@ -122,7 +122,7 @@ Frontmatter (all keys are documented Claude Code skill fields):
 | `disable-model-invocation` | `true` | Claude cannot auto-load it; its description stays out of context until invoked |
 | `argument-hint` | flags + `<task>` | Autocomplete hint |
 | `model` | `opus` | Planning and integration need judgment; the override lasts for the current turn only |
-| `effort` | `high` | Explicit, because Opus 5.5 defaults to `medium` |
+| `effort` | `medium` | Planning and routing are structured work; medium keeps orchestration overhead low |
 
 The skill must stay under 500 lines; details go in `reference/`.
 

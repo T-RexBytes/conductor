@@ -77,7 +77,7 @@
   },
   "orchestrator": {
     "model": "opus",
-    "effort": "high"
+    "effort": "medium"
   },
   "escalation_order": ["scout", "worker", "builder", "builder-plus", "architect"],
   "max_escalations_per_task": 2,

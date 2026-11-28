@@ -4,7 +4,7 @@ description: Plan-first, cost-aware orchestration for multi-step work. Breaks th
 disable-model-invocation: true
 argument-hint: "[--plan-only] [--yes] [--no-recon] [--profile budget|balanced|quality] [--parallel N] <task>"
 model: opus
-effort: high
+effort: medium
 ---
 
 # Tierly: cost-aware orchestration
