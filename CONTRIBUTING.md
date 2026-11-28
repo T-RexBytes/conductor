@@ -20,6 +20,9 @@ python scripts/validate_repo.py
 python -m pytest -q
 ```
 
+See [docs/MANUAL-CHECKS.md](docs/MANUAL-CHECKS.md) and
+[docs/HANDOFF.md](docs/HANDOFF.md) for manual release checks and maintainer status.
+
 Try the plugin from your clone without installing it:
 
 ```bash

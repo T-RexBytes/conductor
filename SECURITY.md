@@ -1,13 +1,18 @@
 # Security policy
 
+This policy covers the T-RexBytes/tierly repository.
+
 ## Supported versions
 
 | Version | Supported |
 |---|---|
-| Latest release | Yes |
-| Older releases | No; please upgrade |
+| 0.1.x | Yes |
+| Other versions | No; please upgrade |
 
 ## Reporting a vulnerability
+
+Open a private advisory at
+<https://github.com/T-RexBytes/tierly/security/advisories/new>.
 
 Please do not open a public issue. Use GitHub's private vulnerability reporting on this
 repository ("Security" tab → "Report a vulnerability"). Include steps to reproduce, the Tierly

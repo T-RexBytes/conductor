@@ -11,7 +11,7 @@ Read first: `CLAUDE.md`, then `docs/MVP.md` and `docs/BUILD-SPEC.md`.
   routing clarifications, live-eval fixes, GitHub marketplace distribution and Dependabot.
 - Live evals: E1, E2, E4, E6 and E9 passed. E3 passed except its one-line plan printed in 2 of 3
   runs. E5 and E10 exposed gaps; fixes are in the skill and are being re-checked. E7, E8, V1, V3
-  and V4 are manual checks in docs/MANUAL-CHECKS.md.
+  and V4 are manual checks in MANUAL-CHECKS.md.
 - GitHub install checked with Claude Code 2.1.332: marketplace add and plugin install succeeded,
   the plugin was enabled, and `claude plugin validate` passed.
 - CI is green.
@@ -23,7 +23,7 @@ Read first: `CLAUDE.md`, then `docs/MVP.md` and `docs/BUILD-SPEC.md`.
 1. Re-check E5 and E10.
 2. Re-check the one-line plan in E3.
 3. Run benchmarks in subscription mode once the harness fix lands.
-4. Complete the manual checks in docs/MANUAL-CHECKS.md.
+4. Complete the manual checks in MANUAL-CHECKS.md.
 5. Complete the MVP section 5 checkboxes.
 6. Tag v0.1.0.
 
