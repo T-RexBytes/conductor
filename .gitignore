@@ -10,3 +10,7 @@ plugins/tierly/evals/results/
 .claude/
 .agents/
 skills-lock.json
+
+# Locked temp folders left by sandboxed test runs on Windows
+.conductor-pytest-*/
+.tierly-pytest-*/

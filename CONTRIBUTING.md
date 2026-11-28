@@ -71,6 +71,9 @@ The PR template repeats this list.
 2. Bump `version` in `plugins/tierly/.claude-plugin/plugin.json`.
 3. Run behavioral evals E1–E10 and the benchmark suite; record results in the release PR.
 4. Merge, tag `vX.Y.Z`, publish a GitHub release with the changelog section.
+5. Work through
+   [docs/MANUAL-CHECKS.md](docs/MANUAL-CHECKS.md) in an interactive session and record the
+   results.
 
 Run the automated behavioral evals with the following command.
 
@@ -81,3 +84,4 @@ claude plugin eval ./plugins/tierly --scaffold --allow-tools "Write,Edit,Bash(py
 ## Reporting bugs and proposing features
 
 Use the issue templates. Security problems go to [SECURITY.md](SECURITY.md), not public issues.
+
